@@ -17,10 +17,10 @@ class reaction_coeffs:
         3003549.0889639612
     '''
 
-    def __init__(self, rtype, **kwargs):
-        if rtype not in ["Constant","Arrhenius","modifiedArrhenius"]:
+    def __init__(self, type, **kwargs):
+        if type not in ["Constant","Arrhenius","modifiedArrhenius"]:
             raise NotImplementedError('Type Not Supported Yet!')
-        self.__rtype = str(rtype)
+        self.__rtype = str(type)
         self.__params = kwargs
         if 'R' not in self.__params:
             self.__params['R'] = 8.314

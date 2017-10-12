@@ -1,4 +1,4 @@
-from reaction_coeffs import *
+from chemkin import *
 def test_str():
     rc = reaction_coeffs('Constant', k = 1e3)
     correct = "Constant Reaction Coeffs:"
