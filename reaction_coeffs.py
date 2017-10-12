@@ -88,10 +88,6 @@ class reaction_coeffs:
         ========
         k constant coefficient
         
-        EXAMPLES
-        =========
-        >>> __const(1.0)
-        1.0
         
         '''
         
@@ -117,11 +113,6 @@ class reaction_coeffs:
         NOTES
         ========
         R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
-        
-        EXAMPLES
-        =========
-        >>> __arr(1e7,1e3,1e2)
-        3003549.0889639612
         
         '''
         # R should never be changed
@@ -155,11 +146,7 @@ class reaction_coeffs:
         NOTES
         ========
         R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
-        
-        EXAMPLES
-        =========
-        >>> __mod_arr(1e7,0.5,1e3,1e2)
-        30035490.889639609
+
         
         '''
         # R should never be changed
