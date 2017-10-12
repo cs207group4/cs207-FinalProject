@@ -2,10 +2,15 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from copy import deepcopy
 
+import xml.etree.ElementTree as ET
+import numpy as np
+from copy import deepcopy
+
 class InputParser:
     
     def __init__(self, file_name):
-        self.raw = ET.parse(file_name).getroot()
+        self.file_name = file_name
+        self.raw = ET.parse(self.file_name).getroot()
         self.species = self.raw.find('phase').find('speciesArray').text.split()
         self.reactions = self.get_reactions(self.raw)
         self.nu_react, self.nu_prod = self.get_nu(self.reactions, self.species)
@@ -56,6 +61,14 @@ class InputParser:
     
     def get_rate_coeff_params(self, reactions):
         return [reaction['rateCoeffParams'] for reaction in reactions]
+    
+    def __repr__(self):
+        '''Return a printable representation of the object.'''
+        return 'InputParser(file_name=\'{}\')'.format(self.file_name)
+    
+    def __len__(self):
+        '''Return the number of chemical reactions.'''
+        return len(self.reactions)
 
 class ReactionCoeffs:
     ''' A class for reaction_coeffs
