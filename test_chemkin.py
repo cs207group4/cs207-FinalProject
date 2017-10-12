@@ -2,7 +2,6 @@ from chemkin import *
 def test_from_xml():
     reactions = chemkin.from_xml('rxns.xml')
     reactions.set_rc_params(T=1000)
-    print(reactions.reaction_rate([[1],[1],[1],[1],[1],[1]]))
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
         -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     assert all(reactions.reaction_rate([[1],[1],[1],[1],[1],[1]]).astype(int) == expect.astype(int))
@@ -40,4 +39,4 @@ def test_construct():
     reactions = chemkin(v1,v2,rc_list)
     for t in [750,1500,2500]:
         reactions.set_rc_params(T=t)
-        assert all(reactions.reaction_rate(x).astype(int) == expect[t].astype(int))
+        assert str(reactions.reaction_rate(x)) == str(expect[t])
