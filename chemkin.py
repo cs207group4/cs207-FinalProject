@@ -66,10 +66,10 @@ class ReactionCoeffs:
         
         EXAMPLES
         =========
-        >>> rc = reaction_coeffs('Constant', k = 1e3)
+        >>> rc = ReactionCoeffs('Constant', k = 1e3)
         >>> rc.kval() 
         1000.0
-        >>> rc = reaction_coeffs('Arrhenius', A = 1e7, E=1e3)
+        >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
         >>> rc.set_params(T=1e2)
         >>> rc.kval() 
         3003549.0889639612
