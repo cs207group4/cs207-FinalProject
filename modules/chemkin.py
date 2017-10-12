@@ -1,6 +1,4 @@
-import numpy as np
-
-class reaction_rates:
+class chemkin:
     '''
     Initialize with matrix of reactant, matrix of product and reaction_coeffs
     '''
@@ -11,6 +9,12 @@ class reaction_rates:
         if nu_prod.shape != nu_react.shape or len(reaction_coeffs) != nu_prod.shape[1]:
             raise ValueError("Dimensions not consistant!")
         self.rc_list = reaction_coeffs
+
+    @classmethod
+    def from_xml(cls, filename):
+        input_ = InputParser(filename)
+        rc_list = rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
+        return cls(input_.nu_react,input_.nu_prod,rc_list)
 
     def set_rc_params(self,**kwargs):
         for rc in self.rc_list:

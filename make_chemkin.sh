@@ -1,6 +1,8 @@
 #!/bin/bash
-cat InputParser.py > chemkin.py
+cat modules/InputParser.py > chemkin.py
 echo '' >> chemkin.py
-cat reaction_coeffs.py >> chemkin.py
 echo '' >> chemkin.py
-cat reaction_rates.py >> chemkin.py
+cat modules/ReactionCoeffs.py >> chemkin.py
+echo '' >> chemkin.py
+echo '' >> chemkin.py
+cat modules/chemkin.py >> chemkin.py

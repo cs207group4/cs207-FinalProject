@@ -1,5 +1,4 @@
-import numpy as np
-class reaction_coeffs:
+class ReactionCoeffs:
     ''' A class for reaction_coeffs
         
         Initialize by calling reaction_coeffs(type, {params})
