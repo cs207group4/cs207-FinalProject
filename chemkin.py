@@ -2,10 +2,6 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from copy import deepcopy
 
-import xml.etree.ElementTree as ET
-import numpy as np
-from copy import deepcopy
-
 class InputParser:
     
     def __init__(self, file_name):
