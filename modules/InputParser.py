@@ -7,7 +7,7 @@ class InputParser:
     def __init__(self, file_name):
         self.file_name = file_name
         self.raw = ET.parse(self.file_name).getroot()
-        self.species = self.raw.find('phase').find('speciesArray').text.split()
+        self.species = self.raw.find('phase').find('speciesArray').text.strip().split()
         self.reactions = self.get_reactions(self.raw)
         self.nu_react, self.nu_prod = self.get_nu(self.reactions, self.species)
         self.rate_coeff_params = self.get_rate_coeff_params(self.reactions)

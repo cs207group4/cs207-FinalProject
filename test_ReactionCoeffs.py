@@ -13,3 +13,21 @@ def test_insufficient():
         rc.kval()
     except ValueError as e:
         assert type(e) == ValueError
+    rc = ReactionCoeffs('Arrhenius', b=0.5)
+    try:
+        rc.kval()
+    except ValueError as e:
+        assert type(e) == ValueError
+    rc = ReactionCoeffs('Constant', A = 1e7, E=1e3, b=0.5)
+    try:
+        rc.kval()
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+
+def test_not_implement():
+    try:
+        rc = ReactionCoeffs('HelloWorld', A = 1e7, E=1e3, b=0.5)
+    except NotImplementedError as e:
+        assert type(e) == NotImplementedError
+        print(e)
