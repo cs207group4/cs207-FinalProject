@@ -1,0 +1,87 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,amsmath,amsfonts,mathpazo,microtype,nicefrac}
+
+% Set-up for hypertext references
+\usepackage{hyperref,color,textcomp}
+\definecolor{webgreen}{rgb}{0,.35,0}
+\definecolor{webbrown}{rgb}{.6,0,0}
+\definecolor{RoyalBlue}{rgb}{0,0,0.9}
+\hypersetup{
+   colorlinks=true, linktocpage=true, pdfstartpage=3, pdfstartview=FitV,
+   breaklinks=true, pdfpagemode=UseNone, pageanchor=true, pdfpagemode=UseOutlines,
+   plainpages=false, bookmarksnumbered, bookmarksopen=true, bookmarksopenlevel=1,
+   hypertexnames=true, pdfhighlight=/O,
+   urlcolor=webbrown, linkcolor=RoyalBlue, citecolor=webgreen,
+   pdfauthor={Jane Huang, Kimia Mavon, Weidong Xu, Jeffrey Zhao},
+   pdfsubject={chemkin User Manual},
+   pdfkeywords={},
+   pdfcreator={pdfLaTeX},
+   pdfproducer={LaTeX with hyperref}
+}
+\hypersetup{pdftitle={User Manual}}
+
+% Macro definitions
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\p}{\partial}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\vx}{\vec{x}}
+\newcommand{\vp}{\vec{p}}
+\newcommand{\Trans}{\mathsf{T}}
+
+\begin{document}
+\title{The \textsc{chemkin} User Manual}
+\author{Jane Huang, Kimia Mavon, Weidong Xu, Jeffrey Zhao}
+\date{}
+\maketitle
+\section{Introduction}
+
+
+\textsc{chemkin} is a Python library that computes the reaction rates of all species participating in a system of elementary, irreversible reactions. 
+
+\subsection{Key chemical concepts and terminology}
+
+A system consisting of $M$ elementary reactions involving $N$ species has the general form 
+\begin{align}
+  \sum_{i=1}^{N}{\nu_{ij}^{\prime}\mathcal{S}_{i}} \longrightarrow 
+  \sum_{i=1}^{N}{\nu_{ij}^{\prime\prime}\mathcal{S}_{i}}, \qquad j = 1, \ldots, M.
+\end{align}
+
+$S_i$ is the $i$th specie in the system, $\nu_{ij}^{\prime}$ is its stoichiometric coefficient (dimensionless) on the reactants side of the $j$th reaction, and $\nu_{ij}^{\prime\prime}$ is its stoichiometric coefficient (dimensionless) on the product side for the $j$th reaction. 
+
+Each specie is characterized by a concentration $x_i$, in units of [mol/vol]. 
+The \textbf{reaction rate} of each specie is the time rate of change of its concentration, $\frac{dx_i}{dt}$. The reaction rate is usually represented by the symbol $f_i$, such that 
+\begin{align}
+  f_{i} = \sum_{j=1}^{M}{(\nu_{ij}^{\prime\prime}-\nu_{ij}^\prime)\omega_{j}}= \sum_{j=1}^{M}{\nu_{ij}\omega_{j}}, \qquad i = 1, \ldots, N.
+\end{align}
+
+$\omega_j$ is the \textbf{progress rate} of the $j$th reaction, 
+\begin{align}
+  \omega_{j} = k_{j}\prod_{i=1}^{N}{x_{i}^{\nu_{ij}^{\prime}}}, \qquad j = 1, \ldots, M. 
+\end{align}
+\subsection{Features}
+
+The package can solve for the reaction rates of a system with an arbitrary number of species and elementary reactions. The reaction rate coefficient $k$ for each reaction is assumed to take one of three possible forms:
+\begin{enumerate}
+\item $k=$ constant
+\item Arrhenius: $k=A\exp(-\frac{E}{RT})$, where $A$ is the pre-factor, $E$ is the activation energy, $R$ is the universal gas constant, and $T$ is the temperature. 
+\item Modified Arrhenius: $k=AT^b\exp(-\frac{E}{RT})$, where $A$ is the pre-factor, $E$ is the activation energy, $R$ is the universal gas constant, $T$ is the temperature, and $b$ is the temperature scaling parameter. 
+\end{enumerate}
+
+\subsubsection{Input}
+\subsubsection{Output}
+\subsubsection{Installation} 
+
+Describe where the code can be found and downloaded. Tell the user how to run the test suite. We are not releasing this code as a package yet, but when we do that this section will include instructions how how to install the package.
+
+\section{Basic Usage and Examples}
+
+\subsection{Input format}
+
+Provide a few examples on using your software in some common situations. You may want to show how the code works with a small set of reactions.
+
+
+
+\end{document}
