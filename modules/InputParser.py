@@ -4,31 +4,44 @@ from copy import deepcopy
 
 class InputParser:
     """
-    Returns the roots of a quadratic equation: ax^2 + bx + c = 0.
+    This class Input Parser takes the input of a xml file 
+    and creates a dictionary. 
+   
     
     INPUTS
     =======
-    a: float, optional, default value is 1
-       Coefficient of quadratic term
-    b: float, optional, default value is 2
-       Coefficient of linear term
-    c: float, optional, default value is 0
-       Constant term
-    
+  'equation' - an equation of the chemical reaction to solve
+  'id'- the number of reactions in the file
+  'products'- the output of the chemical equation 
+  'rateCoeffParams'- the variables needed to calculate k, or k
+  'reactants' - the input of the chemical equation 
+  'reversible'- yes/no if a reversable equation
+  'type'- the type of reaction (i.e. 'elementary')
+
     RETURNS
     ========
-    roots: 2-tuple of complex floats
-       Has the form (root1, root2) unless a = 0 
-       in which case a ValueError exception is raised
+   ###### returns a dictionary with the following keys: 
+  'equation'
+  'id'
+  'products'
+  'rateCoeffParams'
+  'reactants'
+  'reversible': 
+  'type'
     
     EXAMPLES
     =========
-    >>> quad_roots(1.0, 1.0, -12.0)
-    ((3+0j), (-4+0j))
+    >>> input_ = InputParser('rxns.xml')
+    >>> print(input_.species)
+    ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
     """
     
     
     def __init__(self, file_name):
+        """
+        __init__ is used whenever an object of the class is constructed. 
+
+        """ 
         self.file_name = file_name
         self.raw = ET.parse(self.file_name).getroot()
         self.species = self.raw.find('phase').find('speciesArray').text.strip().split()
@@ -37,7 +50,12 @@ class InputParser:
         self.rate_coeff_params = self.get_rate_coeff_params(self.reactions)
         
     def get_reactions(self, raw):
+        """
+        Identifies: 
+        - elements in reaction and number of moles, including reactants and products
+        - k, Depending on the input (as a given constant or calculated using Arrhenius/modified Arrhenius functions)
         
+        """
         def parse_rate_coeff(reaction, reaction_dict):
             rc_ = reaction.find('rateCoeff')
             reaction_dict['rateCoeffParams'] = dict()
@@ -68,6 +86,7 @@ class InputParser:
         return reactions
     
     def get_nu(self, reactions, species):
+        
         nu_react = np.zeros((len(species), len(reactions)))
         nu_prod = np.zeros((len(species), len(reactions)))
         for i, reaction in enumerate(reactions):
@@ -80,6 +99,7 @@ class InputParser:
         return nu_react, nu_prod
     
     def get_rate_coeff_params(self, reactions):
+        """getter for rate coefficients"""
         return [reaction['rateCoeffParams'] for reaction in reactions]
     
     def __repr__(self):
