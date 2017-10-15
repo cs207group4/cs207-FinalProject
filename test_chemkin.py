@@ -5,6 +5,7 @@ def test_from_xml():
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
         -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     assert all(reactions.reaction_rate([[1],[1],[1],[1],[1],[1]]).astype(int) == expect.astype(int))
+    return reactions
 
 def test_construct():
     rc_list = [
@@ -40,3 +41,32 @@ def test_construct():
     for t in [750,1500,2500]:
         reactions.set_rc_params(T=t)
         assert str(reactions.reaction_rate(x)) == str(expect[t])
+    reactions = chemkin.init_const_rc(v1,v2,[1,1,1],['X','Y','Z'])
+    print(reactions)
+
+def test_str_repr():
+    reactions = test_from_xml()
+    reactions_1 = eval(repr(reactions))
+    print(reactions_1)
+    print(reactions)
+    assert 3==len(reactions_1)
+
+def test_dimension_error():
+    try:
+        reactions = chemkin.init_const_rc([[1,2],[1,2]],[[1,2],[1,2]],[1,1,1],['X','Y','Z'])
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+
+def test_bad_x():
+    reactions = test_from_xml()
+    try:
+        reactions.progress_rate([[1],[1]])
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+    try:
+        reactions.reaction_rate([[1],[1]])
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)

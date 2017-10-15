@@ -3,23 +3,44 @@ class chemkin:
     Initialize with matrix of reactant, matrix of product and reaction_coeffs
     '''
 
-    def __init__(self,nu_react,nu_prod,reaction_coeffs):
+    def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None):
         self.nu_react = np.array(nu_react)
         self.nu_prod = np.array(nu_prod)
-        if nu_prod.shape != nu_react.shape or len(reaction_coeffs) != nu_prod.shape[1]:
+        if self.nu_prod.shape != self.nu_react.shape or len(reaction_coeffs) != self.nu_prod.shape[1]:
             raise ValueError("Dimensions not consistant!")
         self.rc_list = reaction_coeffs
+        self.species = species
 
     @classmethod
     def from_xml(cls, filename):
         input_ = InputParser(filename)
-        rc_list = rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
-        return cls(input_.nu_react,input_.nu_prod,rc_list)
+        rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
+        return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species)
+
+    @classmethod
+    def init_const_rc(cls,nu_react,nu_prod,rcs,species=None):
+        rc_list = [ReactionCoeffs(type="Constant", k=rc_) for rc_ in rcs]
+        return cls(nu_react,nu_prod,rc_list,species)
 
     def set_rc_params(self,**kwargs):
         for rc in self.rc_list:
             rc.set_params(**kwargs)
 
+    def __repr__(self):
+        class_name = type(self).__name__
+        args = repr(self.nu_react.tolist()) + ',' + repr(self.nu_prod.tolist()) + ',' + repr(self.rc_list) + ',' + repr(self.species)
+        return class_name + "(" + args +")"
+
+    def __len__(self):
+        '''return number of reactions'''
+        return len(self.rc_list)
+
+    def __str__(self):
+        species_str = "chemkin: " + (str(self.species) if self.species else "")
+        nu_react_str = "nu_react:\n" + str(self.nu_react)
+        nu_prod_str = "nu_prod:\n" + str(self.nu_prod)
+        rc_str = "reaction coefficients:\n[\n" + "\n".join([str(rc_) for rc_ in self.rc_list]) + "\n]"
+        return "\n".join([species_str,nu_react_str,nu_prod_str,rc_str])
 
     def progress_rate(self,x):
         ''' 
