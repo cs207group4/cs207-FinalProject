@@ -3,8 +3,36 @@ import numpy as np
 from copy import deepcopy
 
 class InputParser:
+    """
+    Returns the roots of a quadratic equation: ax^2 + bx + c = 0.
+    
+    INPUTS
+    =======
+    a: float, optional, default value is 1
+       Coefficient of quadratic term
+    b: float, optional, default value is 2
+       Coefficient of linear term
+    c: float, optional, default value is 0
+       Constant term
+    
+    RETURNS
+    ========
+    roots: 2-tuple of complex floats
+       Has the form (root1, root2) unless a = 0 
+       in which case a ValueError exception is raised
+    
+    EXAMPLES
+    =========
+    >>> quad_roots(1.0, 1.0, -12.0)
+    ((3+0j), (-4+0j))
+    """
+    
     
     def __init__(self, file_name):
+            """
+    DESCRIBE EACH ATRBT
+    
+    """
         self.file_name = file_name
         self.raw = ET.parse(self.file_name).getroot()
         self.species = self.raw.find('phase').find('speciesArray').text.strip().split()
@@ -13,8 +41,31 @@ class InputParser:
         self.rate_coeff_params = self.get_rate_coeff_params(self.reactions)
         
     def get_reactions(self, raw):
+                    """
+gETTER
+    
+    """
         
         def parse_rate_coeff(reaction, reaction_dict):
+                        """
+    Returns the roots of a quadratic equation: ax^2 + bx + c = 0.
+    
+    INPUTS
+    =======
+    a: float, optional, default value is 1
+       Coefficient of quadratic term
+    b: float, optional, default value is 2
+       Coefficient of linear term
+    c: float, optional, default value is 0
+       Constant term
+    
+    RETURNS
+    ========
+    roots: 2-tuple of complex floats
+       Has the form (root1, root2) unless a = 0 
+       in which case a ValueError exception is raised
+    
+    """
             rc_ = reaction.find('rateCoeff')
             reaction_dict['rateCoeffParams'] = dict()
             if None != rc_.find('Constant'):
@@ -65,6 +116,8 @@ class InputParser:
     def __len__(self):
         '''Return the number of chemical reactions.'''
         return len(self.reactions)
+    
+
 
 class ReactionCoeffs:
     ''' A class for reaction_coeffs
