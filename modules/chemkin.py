@@ -1,7 +1,29 @@
 class chemkin:
-    '''
+
+     """
+    This class Chemkin computes the the reaction rates/ progress rates of the species 
+    at each temperature of interest given species concentrations
+    
+    
+    INPUTS
+    =======
     Initialize with matrix of reactant, matrix of product and reaction_coeffs
-    '''
+    Using an XML file, the class calls InputParser and ReactionCoeffs to calculate the reaction rates
+
+    RETURNS
+    ========
+   ###### 
+   Returns the reaction rates/ progress rates of the species 
+    at each temperature of interest given species concentrations
+    
+    EXAMPLES
+    =========
+     ## HOW CAN I PRINT AN EXAMPLE WITHOUT USING THE XML FILE? 
+    ###>>> 
+
+    
+    
+"""
 
     def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None):
         self.nu_react = np.array(nu_react)
@@ -13,6 +35,9 @@ class chemkin:
 
     @classmethod
     def from_xml(cls, filename):
+        """
+        calls Input Parser to parse xml file
+        """
         input_ = InputParser(filename)
         rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
         return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species)

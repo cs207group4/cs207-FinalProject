@@ -5,7 +5,7 @@ from copy import deepcopy
 class InputParser:
     """
     This class Input Parser takes the input of a xml file 
-    and creates a dictionary. 
+    and creates useful variables can be called by other functions or users
    
     
     INPUTS
@@ -20,7 +20,7 @@ class InputParser:
 
     RETURNS
     ========
-   ###### returns a dictionary with the following keys: 
+   ###### Identifies following variables: 
   'equation'
   'id'
   'products'
