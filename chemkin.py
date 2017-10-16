@@ -4,35 +4,39 @@ from copy import deepcopy
 
 class InputParser:
     """
-    Returns the roots of a quadratic equation: ax^2 + bx + c = 0.
+    This class Input Parser takes the input of a xml file 
+    and creates useful variables can be called by other functions or users
+   
     
     INPUTS
     =======
-    a: float, optional, default value is 1
-       Coefficient of quadratic term
-    b: float, optional, default value is 2
-       Coefficient of linear term
-    c: float, optional, default value is 0
-       Constant term
+    file_name: the xml filename.
     
+
     RETURNS
     ========
-    roots: 2-tuple of complex floats
-       Has the form (root1, root2) unless a = 0 
-       in which case a ValueError exception is raised
+    ###### After init, following class variables can be used: 
+    'equation' - an equation of the chemical reaction to solve
+    'id'- the number of reactions in the file
+    'products'- the output of the chemical equation 
+    'rateCoeffParams'- the variables needed to calculate k, or k
+    'reactants' - the input of the chemical equation 
+    'reversible'- yes/no if a reversable equation
+    'type'- the type of reaction (i.e. 'elementary')
     
     EXAMPLES
     =========
-    >>> quad_roots(1.0, 1.0, -12.0)
-    ((3+0j), (-4+0j))
+    >>> input_ = InputParser('rxns.xml')
+    >>> print(input_.species)
+    ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
     """
     
     
     def __init__(self, file_name):
-            """
-    DESCRIBE EACH ATRBT
-    
-    """
+        """
+        __init__ is used whenever an object of the class is constructed. 
+
+        """ 
         self.file_name = file_name
         self.raw = ET.parse(self.file_name).getroot()
         self.species = self.raw.find('phase').find('speciesArray').text.strip().split()
@@ -41,31 +45,13 @@ class InputParser:
         self.rate_coeff_params = self.get_rate_coeff_params(self.reactions)
         
     def get_reactions(self, raw):
-                    """
-gETTER
-    
-    """
+        """
+        Identifies: 
+        - elements in reaction and number of moles, including reactants and products
+        - k, Depending on the input (as a given constant or calculated using Arrhenius/modified Arrhenius functions)
         
+        """
         def parse_rate_coeff(reaction, reaction_dict):
-                        """
-    Returns the roots of a quadratic equation: ax^2 + bx + c = 0.
-    
-    INPUTS
-    =======
-    a: float, optional, default value is 1
-       Coefficient of quadratic term
-    b: float, optional, default value is 2
-       Coefficient of linear term
-    c: float, optional, default value is 0
-       Constant term
-    
-    RETURNS
-    ========
-    roots: 2-tuple of complex floats
-       Has the form (root1, root2) unless a = 0 
-       in which case a ValueError exception is raised
-    
-    """
             rc_ = reaction.find('rateCoeff')
             reaction_dict['rateCoeffParams'] = dict()
             if None != rc_.find('Constant'):
@@ -95,6 +81,8 @@ gETTER
         return reactions
     
     def get_nu(self, reactions, species):
+        ''' get the nu for both reactants and products.
+        '''
         nu_react = np.zeros((len(species), len(reactions)))
         nu_prod = np.zeros((len(species), len(reactions)))
         for i, reaction in enumerate(reactions):
@@ -107,6 +95,7 @@ gETTER
         return nu_react, nu_prod
     
     def get_rate_coeff_params(self, reactions):
+        """getter for rate coefficients"""
         return [reaction['rateCoeffParams'] for reaction in reactions]
     
     def __repr__(self):
@@ -160,6 +149,8 @@ class ReactionCoeffs:
         return str(class_name)+'("'+self.__rtype+'"'+params_str+')'
 
     def __eq__(self,other):
+        ''' check if two coeffs are the same. They are same if k is the same...
+        '''
         return self.kval() == other.kval()
 
     def __check_param_in(self, param_list):
@@ -176,6 +167,18 @@ class ReactionCoeffs:
         return param_dict
 
     def kval(self):
+        ''' A wrapper function
+
+        NOTES
+        ==========
+        call corresponding private method to calculate k_values.
+        Easy to extend... Just write a new private method for new type of coeffs.
+
+        RETURNS
+        ==========
+        k: (real number) reaction coeffs.
+
+        '''
         if self.__rtype == "Constant":
             params = self.__check_param_in(['k'])
             if params != None:
@@ -284,8 +287,33 @@ class ReactionCoeffs:
             return np.inf
 
 class chemkin:
+
     '''
+    This class Chemkin computes the the reaction rates/ progress rates of the species
+    at each temperature of interest given species concentrations
+
+
+    INPUTS
+    =======
     Initialize with matrix of reactant, matrix of product and reaction_coeffs
+    Using an XML file, the class calls InputParser and ReactionCoeffs to calculate the reaction rates
+
+    RETURNS
+    ========
+    After initialization, user could call:
+     - set_rc_params(T=..., R=..., A=...): method to set params of reaction coeffs
+     - reaction_rate(x): method to calculate reaction rate given concentration x
+     - reaction_rate_T(x,T): method to calculate reaction rate given concentracion x and temprature T.
+     - species: A variable containing species' names.
+     - progress_rate(x): calculate progress rate given x...
+
+    EXAMPLES
+    =========
+    >>> chem = chemkin.from_xml("rxns.xml")
+    >>> print(chem.species)
+    ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
+    >>> chem.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000)
+    
     '''
 
     def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None):
@@ -298,6 +326,9 @@ class chemkin:
 
     @classmethod
     def from_xml(cls, filename):
+        """
+        calls Input Parser to parse xml file
+        """
         input_ = InputParser(filename)
         rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
         return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species)
@@ -328,54 +359,61 @@ class chemkin:
         return "\n".join([species_str,nu_react_str,nu_prod_str,rc_str])
 
     def progress_rate(self,x):
-        ''' 
+        '''
         return progress rate for reactions of form:
         v_11 A + v_21 B -> v_31 C
         v_12 A + v_32 C -> v_22 B + v_32 C
-        
+
         or a more general form
-        
+
         INPUTS
         =======
         x: A i*1 vector specifying concentration of each specie
-        
+
         RETURNS
         ========
         R: Progress rates of j reactions (np.array)
-        
+
         '''
-        
+
         x = np.array(x)
-        
+
         if x.shape[1] != 1 or x.shape[0] != self.nu_prod.shape[0]:
             raise ValueError("Must satisfy: x -> i*1 matrix, i is the number of species")
-            
+
         # Return an array
         return np.array([rc.kval() for rc in self.rc_list]).astype(float) * np.product(x ** self.nu_react, axis = 0)
 
     def reaction_rate(self,x):
-        ''' 
+        '''
         return reaction rate for each species in the system:
         v_11 A + v_21 B -> v_31 C
         v_32 C -> v_12 A + v_22 B
-        
+
         or a more general form
-        
+
         INPUTS
         =======
         x: A i*1 vector specifying concentration of each specie
-        
+
         RETURNS
         ========
         R: reaction rates of species (np.array)
-        
+
         '''
         x = np.array(x)
-        
+
         if x.shape[1] != 1 or x.shape[0] != self.nu_prod.shape[0]:
             raise ValueError("Must satisfy: x -> i*1 matrix, i is the number of species")
-        
+
         r = self.progress_rate(x)
-            
+
         # Return an array...
         return np.sum(r * (self.nu_prod-self.nu_react), axis=1)
+
+    def reaction_rate_T(self, x, T):
+        '''
+        A function to easily calculate reaction rate based on x and T.
+        '''
+        self.set_rc_params(T=T)
+        return self.reaction_rate(x)

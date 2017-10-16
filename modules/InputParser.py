@@ -10,24 +10,19 @@ class InputParser:
     
     INPUTS
     =======
-  'equation' - an equation of the chemical reaction to solve
-  'id'- the number of reactions in the file
-  'products'- the output of the chemical equation 
-  'rateCoeffParams'- the variables needed to calculate k, or k
-  'reactants' - the input of the chemical equation 
-  'reversible'- yes/no if a reversable equation
-  'type'- the type of reaction (i.e. 'elementary')
+    file_name: the xml filename.
+    
 
     RETURNS
     ========
-   ###### Identifies following variables: 
-  'equation'
-  'id'
-  'products'
-  'rateCoeffParams'
-  'reactants'
-  'reversible': 
-  'type'
+    ###### After init, following class variables can be used: 
+    'equation' - an equation of the chemical reaction to solve
+    'id'- the number of reactions in the file
+    'products'- the output of the chemical equation 
+    'rateCoeffParams'- the variables needed to calculate k, or k
+    'reactants' - the input of the chemical equation 
+    'reversible'- yes/no if a reversable equation
+    'type'- the type of reaction (i.e. 'elementary')
     
     EXAMPLES
     =========
@@ -86,7 +81,8 @@ class InputParser:
         return reactions
     
     def get_nu(self, reactions, species):
-        
+        ''' get the nu for both reactants and products.
+        '''
         nu_react = np.zeros((len(species), len(reactions)))
         nu_prod = np.zeros((len(species), len(reactions)))
         for i, reaction in enumerate(reactions):
