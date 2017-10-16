@@ -1,10 +1,10 @@
 class chemkin:
 
      """
-    This class Chemkin computes the the reaction rates/ progress rates of the species 
+    This class Chemkin computes the the reaction rates/ progress rates of the species
     at each temperature of interest given species concentrations
-    
-    
+
+
     INPUTS
     =======
     Initialize with matrix of reactant, matrix of product and reaction_coeffs
@@ -12,17 +12,17 @@ class chemkin:
 
     RETURNS
     ========
-   ###### 
-   Returns the reaction rates/ progress rates of the species 
+   ######
+   Returns the reaction rates/ progress rates of the species
     at each temperature of interest given species concentrations
-    
+
     EXAMPLES
     =========
-     ## HOW CAN I PRINT AN EXAMPLE WITHOUT USING THE XML FILE? 
-    ###>>> 
+     ## HOW CAN I PRINT AN EXAMPLE WITHOUT USING THE XML FILE?
+    ###>>>
 
-    
-    
+
+
 """
 
     def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None):
@@ -68,54 +68,61 @@ class chemkin:
         return "\n".join([species_str,nu_react_str,nu_prod_str,rc_str])
 
     def progress_rate(self,x):
-        ''' 
+        '''
         return progress rate for reactions of form:
         v_11 A + v_21 B -> v_31 C
         v_12 A + v_32 C -> v_22 B + v_32 C
-        
+
         or a more general form
-        
+
         INPUTS
         =======
         x: A i*1 vector specifying concentration of each specie
-        
+
         RETURNS
         ========
         R: Progress rates of j reactions (np.array)
-        
+
         '''
-        
+
         x = np.array(x)
-        
+
         if x.shape[1] != 1 or x.shape[0] != self.nu_prod.shape[0]:
             raise ValueError("Must satisfy: x -> i*1 matrix, i is the number of species")
-            
+
         # Return an array
         return np.array([rc.kval() for rc in self.rc_list]).astype(float) * np.product(x ** self.nu_react, axis = 0)
 
     def reaction_rate(self,x):
-        ''' 
+        '''
         return reaction rate for each species in the system:
         v_11 A + v_21 B -> v_31 C
         v_32 C -> v_12 A + v_22 B
-        
+
         or a more general form
-        
+
         INPUTS
         =======
         x: A i*1 vector specifying concentration of each specie
-        
+
         RETURNS
         ========
         R: reaction rates of species (np.array)
-        
+
         '''
         x = np.array(x)
-        
+
         if x.shape[1] != 1 or x.shape[0] != self.nu_prod.shape[0]:
             raise ValueError("Must satisfy: x -> i*1 matrix, i is the number of species")
-        
+
         r = self.progress_rate(x)
-            
+
         # Return an array...
         return np.sum(r * (self.nu_prod-self.nu_react), axis=1)
+
+    def reaction_rate_T(self, x, T):
+        '''
+        A function to easily calculate reaction rate based on x and T.
+        '''
+        self.set_rc_params(T=T)
+        return self.reaction_rate(x)
