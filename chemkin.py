@@ -313,7 +313,8 @@ class chemkin:
     >>> print(chem.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
     >>> chem.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000)
-    
+    array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
+            -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     '''
 
     def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None):
@@ -327,7 +328,7 @@ class chemkin:
     @classmethod
     def from_xml(cls, filename):
         """
-        calls Input Parser to parse xml file
+        calls Input Parser to parse xml file, returns a initialized object
         """
         input_ = InputParser(filename)
         rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
@@ -335,10 +336,14 @@ class chemkin:
 
     @classmethod
     def init_const_rc(cls,nu_react,nu_prod,rcs,species=None):
+        ''' construct an object with all constant or precalculated coeffs.
+        '''
         rc_list = [ReactionCoeffs(type="Constant", k=rc_) for rc_ in rcs]
         return cls(nu_react,nu_prod,rc_list,species)
 
     def set_rc_params(self,**kwargs):
+        ''' add new or change old parameters for all reaction coeffs.
+        '''
         for rc in self.rc_list:
             rc.set_params(**kwargs)
 
