@@ -2,7 +2,7 @@
 \usepackage{fullpage,amsmath,amsfonts,mathpazo,microtype,nicefrac}
 
 % Set-up for hypertext references
-\usepackage{hyperref,color,textcomp}
+\usepackage{hyperref,color,textcomp,listings}
 
 \definecolor{RoyalBlue}{rgb}{0,0,0.9}
 \hypersetup{
@@ -25,7 +25,7 @@
 
 \begin{document}
 \title{The \textsc{chemkin} User Manual}
-\author{Jane Huang, Kimia Mavon, Weidong Xu, Jeffrey Zhao}
+\author{Jane Huang, Kimia Mavon, Weidong Xu, Zeyu Zhao}
 \date{}
 \maketitle
 \section{Introduction}
@@ -73,6 +73,8 @@ The package is freely available at \url{https://github.com/cs207group4/cs207-Fin
 
 Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file.
 
+If you just want to use the library, you can download the single library file at \url{https://raw.githubusercontent.com/cs207group4/cs207-FinalProject/master/chemkin.py}
+
 \subsection{Dependencies}
 
 This package has several dependencies. These usually come standard with the Anaconda distribution, but are straightforward to install if you do not have them in your Python distribution. (Click on the individual package names to be directed to their website and installation instructions).  
@@ -104,7 +106,13 @@ In an xml input file, the user provides the species participating in the reactio
 
 \subsection{Computing reaction rates}
 
-Provide a few examples on using your software in some common situations. You may want to show how the code works with a small set of reactions.
+The following example shows how to read reaction systems from an xml and calculate the reaction rate under $T = 1000$ and all concentration is $1$.
+
+\begin{lstlisting}
+from chemkin import *
+reactions = chemkin.from_xml('rxns.xml')
+reactions.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000)
+\end{lstlisting}
 
 
 

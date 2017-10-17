@@ -39,6 +39,8 @@ class ReactionCoeffs:
         return str(class_name)+'("'+self.__rtype+'"'+params_str+')'
 
     def __eq__(self,other):
+        ''' check if two coeffs are the same. They are same if k is the same...
+        '''
         return self.kval() == other.kval()
 
     def __check_param_in(self, param_list):
@@ -55,6 +57,18 @@ class ReactionCoeffs:
         return param_dict
 
     def kval(self):
+        ''' A wrapper function
+
+        NOTES
+        ==========
+        call corresponding private method to calculate k_values.
+        Easy to extend... Just write a new private method for new type of coeffs.
+
+        RETURNS
+        ==========
+        k: (real number) reaction coeffs.
+
+        '''
         if self.__rtype == "Constant":
             params = self.__check_param_in(['k'])
             if params != None:

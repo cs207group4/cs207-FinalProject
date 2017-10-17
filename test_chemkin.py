@@ -7,6 +7,12 @@ def test_from_xml():
     assert all(reactions.reaction_rate([[1],[1],[1],[1],[1],[1]]).astype(int) == expect.astype(int))
     return reactions
 
+def test_reaction_rate_with_T():
+    reactions = test_from_xml()
+    expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
+        -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
+    assert all(reactions.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000).astype(int) == expect.astype(int))
+
 def test_construct():
     rc_list = [
         ReactionCoeffs(type = "modifiedArrhenius", A=1e8, b=0.5, E=5e4),
