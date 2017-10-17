@@ -155,8 +155,8 @@ class InputParser:
         Return tuple of arrays corresponding to stoichiometric coefficients for reactants and for products
         """
 
-        nu_react = np.zeros((len(self.species), len(self.reactions)))
-        nu_prod = np.zeros((len(self.species), len(self.reactions)))
+        nu_react = np.zeros((len(self.species), len(self.reactions)), dtype = int)
+        nu_prod = np.zeros((len(self.species), len(self.reactions)), dtype = int)
 
         for i, reaction in enumerate(self.reactions):
             if not (reaction['reversible'] == 'no' and reaction['type'] == 'Elementary'):
@@ -179,6 +179,7 @@ class InputParser:
     def __len__(self):
         """Return the number of chemical reactions."""
         return len(self.reactions)
+
 
 class ReactionCoeffs:
     ''' A class for reaction_coeffs
