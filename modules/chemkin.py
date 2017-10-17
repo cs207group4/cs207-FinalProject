@@ -22,6 +22,7 @@ class chemkin:
     EXAMPLES
     =========
     >>> chem = chemkin.from_xml("rxns.xml")
+    Finished reading xml input file
     >>> print(chem.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
     >>> chem.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000)
