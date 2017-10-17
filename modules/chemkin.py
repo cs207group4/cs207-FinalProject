@@ -25,7 +25,7 @@ class chemkin:
     Finished reading xml input file
     >>> print(chem.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
-    >>> chem.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000)
+    >>> chem.reaction_rate_T([1,1,1,1,1,1],1000)
     array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
             -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     '''
@@ -36,7 +36,7 @@ class chemkin:
         self.nu_react = np.array(nu_react)
         self.nu_prod = np.array(nu_prod)
         if self.nu_prod.shape != self.nu_react.shape or len(reaction_coeffs) != self.nu_prod.shape[1]:
-            raise ValueError("Dimensions not consistant!")
+            raise ValueError("Dimensions not consistent!")
         self.rc_list = reaction_coeffs
         self.species = species
 
@@ -47,7 +47,7 @@ class chemkin:
         """
         input_ = InputParser(filename)
         rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
-        return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species)
+        return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species, input_.reactions)
 
     @classmethod
     def init_const_rc(cls,nu_react,nu_prod,rcs,species=None):
@@ -97,9 +97,13 @@ class chemkin:
         '''
 
         x = np.array(x)
-
-        if x.shape[1] != 1 or x.shape[0] != self.nu_prod.shape[0]:
-            raise ValueError("Must satisfy: x -> i*1 matrix, i is the number of species")
+        if len(x) != self.nu_prod.shape[0]:
+            raise ValueError("ERROR: The concentration vector x must be of length i, where i is the number of species")
+        #check that concentrations are all non-negative:
+        if np.any(x)<0:
+            raise ValueError("ERROR: All the species concentrations must be non-negative")
+        #make the shape compatible with what NumPy needs for vectorized operations
+        x = np.reshape(x, (len(x), 1))
 
         # Return an array
         return np.array([rc.kval() for rc in self.rc_list]).astype(float) * np.product(x ** self.nu_react, axis = 0)
@@ -121,10 +125,15 @@ class chemkin:
         R: reaction rates of species (np.array)
 
         '''
-        x = np.array(x)
 
-        if x.shape[1] != 1 or x.shape[0] != self.nu_prod.shape[0]:
-            raise ValueError("Must satisfy: x -> i*1 matrix, i is the number of species")
+        x = np.array(x)
+        if len(x) != self.nu_prod.shape[0]:
+            raise ValueError("ERROR: The concentration vector x must be of length i, where i is the number of species")
+        #check that concentrations are all non-negative:
+        if np.any(x)<0:
+            raise ValueError("ERROR: All the species concentrations must be non-negative")
+        #make the shape compatible with what NumPy needs for vectorized operations
+        x = np.reshape(x, (len(x), 1))
 
         r = self.progress_rate(x)
 
@@ -135,5 +144,16 @@ class chemkin:
         '''
         A function to easily calculate reaction rate based on x and T.
         '''
+        x = np.array(x)
+        if len(x) != self.nu_prod.shape[0]:
+            raise ValueError("ERROR: The concentration vector x must be of length i, where i is the number of species")
+        #check that concentrations are all non-negative:
+        if np.any(x)<0:
+            raise ValueError("ERROR: All the species concentrations must be non-negative")
+        #make the shape compatible with what NumPy needs for vectorized operations
+        x = np.reshape(x, (len(x), 1))
+
+        if T < 0:
+            raise ValueError("ERROR: Temperature cannot be negative")
         self.set_rc_params(T=T)
         return self.reaction_rate(x)
