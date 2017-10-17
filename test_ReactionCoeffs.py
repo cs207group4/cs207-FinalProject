@@ -1,13 +1,24 @@
 from chemkin import *
 def test_str():
+    """
+    testing override of __str__ for ReactionCoeffs class
+    """
     rc = ReactionCoeffs('Constant', k = 1e3)
     correct = "Constant Reaction Coeffs:"
     assert str(rc)[:len(correct)] == correct
+    
 def test_repr():
+    """
+    testing override of __repr__ for ReactionCoeffs class
+    """
     rc = ReactionCoeffs('modifiedArrhenius', A = 1e7, E=1e3, T=1e2, b=0.5)
     rc1 = eval(repr(rc))
     assert rc == rc1
+    
 def test_insufficient():
+    """
+    test when reaction coefficient params are not suitable for reaction type
+    """
     rc = ReactionCoeffs('modifiedArrhenius', A = 1e7, E=1e3, b=0.5)
     try:
         rc.kval()
@@ -26,6 +37,9 @@ def test_insufficient():
         print(e)
 
 def test_bad_arg():
+    """
+    test for incorrect or extraneous arguments
+    """
     rc = ReactionCoeffs('modifiedArrhenius', A = 1e7, E=1e3, b=(0.5,8j), T=1000)
     try:
         rc.kval()
@@ -58,6 +72,7 @@ def test_bad_arg():
         print(e)
 
 def test_not_implement():
+    """test of hooks (things not yet implemented)"""
     try:
         rc = ReactionCoeffs('HelloWorld', A = 1e7, E=1e3, b=0.5)
     except NotImplementedError as e:

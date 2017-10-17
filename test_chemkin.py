@@ -1,5 +1,8 @@
 from chemkin import *
 def test_from_xml():
+    """
+    testing normal reaction rate calculations from xml input
+    """
     reactions = chemkin.from_xml('rxns.xml')
     reactions.set_rc_params(T=1000)
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
@@ -8,12 +11,18 @@ def test_from_xml():
     return reactions
 
 def test_reaction_rate_with_T():
+    """
+    test wrapper function for specifying temp and concentration in the same function
+    """
     reactions = test_from_xml()
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
         -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     assert all(reactions.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000).astype(int) == expect.astype(int))
 
 def test_construct():
+    """
+    test direct input of reaction system params into instantiation of chemkin object
+    """
     rc_list = [
         ReactionCoeffs(type = "modifiedArrhenius", A=1e8, b=0.5, E=5e4),
         ReactionCoeffs(type = "Constant", k=1e4),
@@ -51,6 +60,9 @@ def test_construct():
     print(reactions)
 
 def test_str_repr():
+    """
+    test override of __str__ and __repr__ functions
+    """
     reactions = test_from_xml()
     reactions_1 = eval(repr(reactions))
     print(reactions_1)
@@ -60,6 +72,9 @@ def test_str_repr():
     print(reactions)
 
 def test_dimension_error():
+    """
+    check that inconsistencies in input params are handled correctly
+    """
     try:
         reactions = chemkin.init_const_rc([[1,2],[1,2]],[[1,2],[1,2]],[1,1,1],['A','B','X','Y','Z'])
     except ValueError as e:
@@ -67,6 +82,9 @@ def test_dimension_error():
         print(e)
 
 def test_bad_x():
+    """
+    test that errors with the shape of the concentration vector are handled correctly
+    """
     reactions = test_from_xml()
     try:
         reactions.progress_rate([[1],[1]])

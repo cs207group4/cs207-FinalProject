@@ -52,7 +52,7 @@ class InputParser:
 
     def get_species(self):
         """
-        Retrieves species array from xml file
+        Retrieves species array from xml file. 
         """
         try:
             species = self.raw.find('phase').find('speciesArray').text.strip().split()
@@ -173,7 +173,7 @@ class InputParser:
         return [reaction['rateCoeffParams'] for reaction in self.reactions]
 
     def __repr__(self):
-        """Return a printable representation of the object."""
+        """Return a printable representation of the object: InputParser(filename = <user-provided filename>)"""
         return 'InputParser(file_name=\'{}\')'.format(self.file_name)
 
     def __len__(self):
