@@ -30,23 +30,27 @@ class chemkin:
             -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     '''
 
-    def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None, rxndata = None):
+    def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None, equations = None):
         self.nu_react = np.array(nu_react)
         self.nu_prod = np.array(nu_prod)
         if self.nu_prod.shape != self.nu_react.shape or len(reaction_coeffs) != self.nu_prod.shape[1]:
             raise ValueError("Dimensions not consistent!")
         self.rc_list = reaction_coeffs
         self.species = species
-        self.rxndata = rxndata
+        self.equations = equations
 
     @classmethod
     def from_xml(cls, filename):
         """
-        calls Input Parser to parse xml file, returns a initialized object
+        calls Input Parser to parse xml file, returns an initialized object
         """
         input_ = InputParser(filename)
         rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
-        return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species, input_.reactions)
+        rxndata = input_.reactions
+        equationlist = []
+        for i, reaction in enumerate(rxndata):
+            equationlist.append(rxndata[i]['equation'])
+        return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species, equationlist)
 
     @classmethod
     def init_const_rc(cls,nu_react,nu_prod,rcs,species=None):
@@ -63,7 +67,7 @@ class chemkin:
 
     def __repr__(self):
         class_name = type(self).__name__
-        args = repr(self.nu_react.tolist()) + ',' + repr(self.nu_prod.tolist()) + ',' + repr(self.rc_list) + ',' + repr(self.species)
+        args = repr(self.nu_react.tolist()) + ',' + repr(self.nu_prod.tolist()) + ',' + repr(self.rc_list) + ',' + repr(self.species)+ ',' + repr(self.equations)
         return class_name + "(" + args +")"
 
     def __len__(self):
@@ -71,11 +75,19 @@ class chemkin:
         return len(self.rc_list)
 
     def __str__(self):
-        species_str = "chemkin: " + (str(self.species) if self.species else "")
+        if self.equations is not None:
+            eqn_str = "chemical equations:\n[\n" + "\n".join([str(eq_) for eq_ in self.equations]) + "\n]"
+        else:
+            eqn_str = "chemical equations: not specified"
+        if self.species is not None:
+
+            species_str = "species: " + (str(self.species) if self.species else "")
+        else:
+            species_str = "species: not specified"
         nu_react_str = "nu_react:\n" + str(self.nu_react)
         nu_prod_str = "nu_prod:\n" + str(self.nu_prod)
         rc_str = "reaction coefficients:\n[\n" + "\n".join([str(rc_) for rc_ in self.rc_list]) + "\n]"
-        return "\n".join([species_str,nu_react_str,nu_prod_str,rc_str])
+        return "\n".join([eqn_str, species_str,nu_react_str,nu_prod_str,rc_str])
 
     def progress_rate(self,x):
         '''
@@ -103,7 +115,7 @@ class chemkin:
             raise ValueError("ERROR: All the species concentrations must be non-negative")
         #make the shape compatible with what NumPy needs for vectorized operations
         x = np.reshape(x, (len(x), 1))
-        
+
         # Return an array
         return np.array([rc.kval() for rc in self.rc_list]).astype(float) * np.product(x ** self.nu_react, axis = 0)
 
@@ -158,8 +170,6 @@ class chemkin:
         return self.reaction_rate(x)
 
 if __name__=="__main__":
-    chem = chemkin.from_xml("rxns.xml")
-
-    print(chem.species)
-    for item in chem.rxndata:
-        print(item)
+    rxn_system = chemkin.from_xml('rxns.xml')
+    print(rxn_system)
+    rxn_system.reaction_rate_T(np.ones(6), 1000.)
