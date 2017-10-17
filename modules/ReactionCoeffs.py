@@ -1,24 +1,24 @@
 class ReactionCoeffs:
     ''' A class for reaction_coeffs
-        
+
         Initialize by calling reaction_coeffs(type, {params})
         Set params by calling set_params({params})
         Get calculated k value by calling kval()
-        
+
         EXAMPLES
         =========
         >>> rc = ReactionCoeffs('Constant', k = 1e3)
-        >>> rc.kval() 
+        >>> rc.kval()
         1000.0
         >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
         >>> rc.set_params(T=1e2)
-        >>> rc.kval() 
+        >>> rc.kval()
         3003549.0889639612
     '''
 
     def __init__(self, type, **kwargs):
         if type not in ["Constant","Arrhenius","modifiedArrhenius"]:
-            raise NotImplementedError('Type Not Supported Yet!')
+            raise NotImplementedError('Rate coefficient type not supported yet! Must be constant, Arrhenius, or modified Arrhenius.')
         self.__rtype = str(type)
         self.__params = kwargs
         if 'R' not in self.__params:
@@ -92,57 +92,58 @@ class ReactionCoeffs:
 
     def __const(self,k):
         ''' return constant coefficient
-        
+
         INPUTS
         =======
         k: constant coefficient
-        
+
         RETURNS
         ========
         k constant coefficient
-        
-        
+
+
         '''
-        
+
         if k < 0:
-            raise ValueError("k can not be negative!")
+            raise ValueError("k cannot be negative!")
         return k
 
     def __arr(self,A,E,T,R):
         ''' return Arrhenius reaction rate coefficient
-        
+
         INPUTS
         =======
         A: Arrhenius prefactor  A. A  is strictly positive
         E: Activation energy
         T: Temperature. T must be positive (assuming a Kelvin scale)
         R: Ideal gas constant
-        
-        
+
+
         RETURNS
         ========
         k: Arrhenius reaction rate coefficient
-        
+
         NOTES
         ========
         R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
-        
+
         '''
         # R should never be changed
         if A <= 0:
             raise ValueError("A must be positive!")
         if T <= 0:
             raise ValueError("T must be positive!")
-        
+
         # On overflow, return np.inf
         try:
             return A*np.exp(-E/(R*T))
         except OverflowError:
+            print("WARNING: Overflow error")
             return np.inf
 
     def __mod_arr(self,A,b,E,T,R):
         ''' return modified Arrhenius reaction rate coefficient
-        
+
         INPUTS
         =======
         A: Arrhenius prefactor  A. A  is strictly positive
@@ -150,17 +151,17 @@ class ReactionCoeffs:
         E: Activation energy
         T: Temperature. T must be positive (assuming a Kelvin scale)
         R: The ideal gas constant
-        
-        
+
+
         RETURNS
         ========
         k: Modified Arrhenius reaction rate coefficient
-        
+
         NOTES
         ========
         R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
 
-        
+
         '''
         # R should never be changed
         if A <= 0:
@@ -169,9 +170,10 @@ class ReactionCoeffs:
             raise ValueError("T must be positive!")
         if not isinstance(b, (float, int)):
             raise ValueError("b must be real!")
-        
+
         # On overflow, return np.inf
         try:
             return A*(T**b)*np.exp(-E/(R*T))
         except OverflowError:
+            print("WARNING: Overflow error")
             return np.inf
