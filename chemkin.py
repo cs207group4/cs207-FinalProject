@@ -417,11 +417,11 @@ class chemkin:
         return cls(input_.nu_react,input_.nu_prod,rc_list,input_.species, equationlist)
 
     @classmethod
-    def init_const_rc(cls,nu_react,nu_prod,rcs,species=None):
+    def init_const_rc(cls,nu_react,nu_prod,rcs,species=None,equations=None):
         ''' construct an object with all constant or precalculated coeffs.
         '''
         rc_list = [ReactionCoeffs(type="Constant", k=rc_) for rc_ in rcs]
-        return cls(nu_react,nu_prod,rc_list,species)
+        return cls(nu_react,nu_prod,rc_list,species,equations)
 
     def set_rc_params(self,**kwargs):
         ''' add new or change old parameters for all reaction coeffs.
