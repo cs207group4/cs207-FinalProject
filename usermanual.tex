@@ -62,7 +62,7 @@ The \textbf{forward reaction rate coefficient} $k_j$ for each reaction is assume
 \end{enumerate}
 
 \subsection{Features}
-The package can solve for the reaction rates of a system with an arbitrary number of species and elementary, irreversible reactions. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array. 
+The package can solve for the reaction rates of a system with an arbitrary number of species and elementary, irreversible reactions. Reaction system can be either read from an xml file or input as NumPy arrays. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array. 
 
 \section{Installation} 
 
@@ -71,7 +71,7 @@ The package is freely available at \url{https://github.com/cs207group4/cs207-Fin
 \newline
 {\tt git clone git@github.com:cs207group4/cs207-FinalProject.git} \newline
 
-Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file.
+Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file. \newline
 
 If you just want to use the library, you can download the single library file at \url{https://raw.githubusercontent.com/cs207group4/cs207-FinalProject/master/chemkin.py}
 
@@ -100,11 +100,28 @@ Reaction 1 has an Arrhenius rate coefficient with $A = 3.52\times 10^{10}$ and $
 
 
 \subsection{Input format}
-In an xml input file, the user provides the species participating in the reactions, the chemical equations, the stoichiometric coefficients, and the rate coefficient parameters. See {\tt rxns.xml} in the repository folder for an example of how to format the input file. 
+In an xml input file, the user provides the species participating in the reactions, the chemical equations, the stoichiometric coefficients, and the rate coefficient parameters. See {\tt rxns.xml} in the repository folder for an example of how to format the input file. To read the xml file and build a {\tt chemkin} object based on it, the user simply call {\tt chemkin.from\_xml(file\_name)}. For example:
 
-\subsection{Specifying temperature and concentration}
+\begin{lstlisting}
+reactions = chemkin.from_xml('rxns.xml')
+\end{lstlisting}
 
 \subsection{Computing reaction rates}
+
+An initialized {\tt chemkin} object can be called to calculate reaction rates given temperature and concentration. For example:
+
+\begin{lstlisting}
+reactions.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000)
+\end{lstlisting}
+
+User could also set a temperature and calculate reaction rates multiple times on different concentrations. For example: 
+
+\begin{lstlisting}
+reactions.set_rc_params(T=1000)
+reactions.reaction_rate([[1],[1],[1],[1],[1],[1]])
+\end{lstlisting}
+
+\subsection{Full example}
 
 The following example shows how to read reaction systems from an xml and calculate the reaction rate under $T = 1000$ and all concentration is $1$.
 
@@ -114,6 +131,6 @@ reactions = chemkin.from_xml('rxns.xml')
 reactions.reaction_rate_T([[1],[1],[1],[1],[1],[1]],1000)
 \end{lstlisting}
 
-
+There are more use cases of our library, please refer to {\tt demo.ipynb}
 
 \end{document}

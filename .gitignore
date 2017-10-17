@@ -108,3 +108,9 @@ venv.bak/
 # COPIED FROM GITHUB JUPYTER IGNORE
 
 .ipynb_checkpoints/
+
+#latex
+.out
+.log
+.aux
+.synctex.gz

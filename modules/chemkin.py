@@ -31,6 +31,8 @@ class chemkin:
     '''
 
     def __init__(self,nu_react,nu_prod,reaction_coeffs,species=None):
+        ''' init with nu_react, nu_prod and a rc_array
+        '''
         self.nu_react = np.array(nu_react)
         self.nu_prod = np.array(nu_prod)
         if self.nu_prod.shape != self.nu_react.shape or len(reaction_coeffs) != self.nu_prod.shape[1]:
