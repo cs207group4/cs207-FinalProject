@@ -60,3 +60,13 @@ def test_missingcoeffdata():
     except AttributeError as e:
         assert type(e) == AttributeError
         print(e)
+    try:
+        input_ = InputParser('test_xml/rxns_missing_k.xml')
+    except AttributeError as e:
+        assert type(e) == AttributeError
+        print(e)
+    try:
+        input_ = InputParser('test_xml/rxns_missing_A.xml')
+    except AttributeError as e:
+        assert type(e) == AttributeError
+        print(e)

@@ -56,6 +56,8 @@ def test_str_repr():
     print(reactions_1)
     print(reactions)
     assert 3==len(reactions_1)
+    reactions.species=None
+    print(reactions)
 
 def test_dimension_error():
     try:
@@ -73,6 +75,16 @@ def test_bad_x():
         print(e)
     try:
         reactions.reaction_rate([[1],[1]])
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+    try:
+        reactions.reaction_rate([[1],[-1],[1],[1],[1],[1]])
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+    try:
+        reactions.reaction_rate_T([[1],[-1],[1],[1],[1],[1]],-1)
     except ValueError as e:
         assert type(e) == ValueError
         print(e)

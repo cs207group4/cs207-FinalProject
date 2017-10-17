@@ -111,7 +111,7 @@ class chemkin:
         if len(x) != self.nu_prod.shape[0]:
             raise ValueError("ERROR: The concentration vector x must be of length i, where i is the number of species")
         #check that concentrations are all non-negative:
-        if np.any(x)<0:
+        if np.any(x<0):
             raise ValueError("ERROR: All the species concentrations must be non-negative")
         #make the shape compatible with what NumPy needs for vectorized operations
         x = np.reshape(x, (len(x), 1))
@@ -137,15 +137,6 @@ class chemkin:
 
         '''
 
-        x = np.array(x)
-        if len(x) != self.nu_prod.shape[0]:
-            raise ValueError("ERROR: The concentration vector x must be of length i, where i is the number of species")
-        #check that concentrations are all non-negative:
-        if np.any(x)<0:
-            raise ValueError("ERROR: All the species concentrations must be non-negative")
-        #make the shape compatible with what NumPy needs for vectorized operations
-        x = np.reshape(x, (len(x), 1))
-
         r = self.progress_rate(x)
 
         # Return an array...
@@ -155,14 +146,6 @@ class chemkin:
         '''
         A function to easily calculate reaction rate based on x and T.
         '''
-        x = np.array(x)
-        if len(x) != self.nu_prod.shape[0]:
-            raise ValueError("ERROR: The concentration vector x must be of length i, where i is the number of species")
-        #check that concentrations are all non-negative:
-        if np.any(x)<0:
-            raise ValueError("ERROR: All the species concentrations must be non-negative")
-        #make the shape compatible with what NumPy needs for vectorized operations
-        x = np.reshape(x, (len(x), 1))
 
         if T < 0:
             raise ValueError("ERROR: Temperature cannot be negative")
