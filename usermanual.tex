@@ -31,71 +31,71 @@
 \section{Introduction}
 
 
-{\tt chemkin} is a Python 3 library that computes the reaction rates of all species participating in a system of elementary, irreversible reactions. 
+{\tt chemkin} is a Python 3 library that computes the reaction rates of all species participating in a system of elementary, irreversible reactions.
 
 \subsection{Key chemical concepts and terminology}
 
-A system consisting of $M$ elementary reactions involving $N$ species has the general form 
+A system consisting of $M$ elementary reactions involving $N$ species has the general form
 \begin{align}
-  \sum_{i=1}^{N}{\nu_{ij}^{\prime}\mathcal{S}_{i}} \longrightarrow 
+  \sum_{i=1}^{N}{\nu_{ij}^{\prime}\mathcal{S}_{i}} \longrightarrow
   \sum_{i=1}^{N}{\nu_{ij}^{\prime\prime}\mathcal{S}_{i}}, \qquad j = 1, \ldots, M.
 \end{align}
 
-$S_i$ is the $i$th specie in the system, $\nu_{ij}^{\prime}$ is its stoichiometric coefficient (dimensionless) on the reactants side of the $j$th reaction, and $\nu_{ij}^{\prime\prime}$ is its stoichiometric coefficient (dimensionless) on the product side for the $j$th reaction. 
+$S_i$ is the $i$th specie in the system, $\nu_{ij}^{\prime}$ is its stoichiometric coefficient (dimensionless) on the reactants side of the $j$th reaction, and $\nu_{ij}^{\prime\prime}$ is its stoichiometric coefficient (dimensionless) on the product side for the $j$th reaction.
 
-Each specie is characterized by a concentration $x_i$, in units of [mol/vol]. 
-The \textbf{reaction rate} of each specie is the time rate of change of its concentration, $\frac{dx_i}{dt}$. The reaction rate is usually represented by the symbol $f_i$, such that 
+Each specie is characterized by a concentration $x_i$, in units of [mol/vol].
+The \textbf{reaction rate} of each specie is the time rate of change of its concentration, $\frac{dx_i}{dt}$. The reaction rate is usually represented by the symbol $f_i$, such that
 \begin{align}
   f_{i} = \sum_{j=1}^{M}{(\nu_{ij}^{\prime\prime}-\nu_{ij}^\prime)\omega_{j}}= \sum_{j=1}^{M}{\nu_{ij}\omega_{j}}, \qquad i = 1, \ldots, N.
 \end{align}
 
-$\omega_j$ is the \textbf{progress rate} of the $j$th reaction, 
+$\omega_j$ is the \textbf{progress rate} of the $j$th reaction,
 \begin{align}
-  \omega_{j} = k_{j}\prod_{i=1}^{N}{x_{i}^{\nu_{ij}^{\prime}}}, \qquad j = 1, \ldots, M. 
+  \omega_{j} = k_{j}\prod_{i=1}^{N}{x_{i}^{\nu_{ij}^{\prime}}}, \qquad j = 1, \ldots, M.
   \end{align}
 
 The \textbf{forward reaction rate coefficient} $k_j$ for each reaction is assumed to take one of three possible forms:
 \begin{enumerate}
 \item $k=$ constant
-\item Arrhenius: $k=A\exp(-\frac{E}{RT})$, where $A$ is the pre-factor, $E$ is the activation energy, $R$ is the universal gas constant, and $T$ is the temperature. 
-\item Modified Arrhenius: $k=AT^b\exp(-\frac{E}{RT})$, where $A$ is the pre-factor, $E$ is the activation energy, $R$ is the universal gas constant, $T$ is the temperature, and $b$ is the temperature scaling parameter. 
+\item Arrhenius: $k=A\exp(-\frac{E}{RT})$, where $A$ is the pre-factor, $E$ is the activation energy, $R$ is the universal gas constant, and $T$ is the temperature.
+\item Modified Arrhenius: $k=AT^b\exp(-\frac{E}{RT})$, where $A$ is the pre-factor, $E$ is the activation energy, $R$ is the universal gas constant, $T$ is the temperature, and $b$ is the temperature scaling parameter.
 \end{enumerate}
 
 \subsection{Features}
-The package can solve for the reaction rates of a system with an arbitrary number of species and elementary, irreversible reactions. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array. 
+The package can solve for the reaction rates of a system with an arbitrary number of species and elementary, irreversible reactions. Reaction system can be either read from an xml file or input as NumPy arrays. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array.
 
-\section{Installation} 
+\section{Installation}
 
 \subsection{Where to find and download the code}
 The package is freely available at \url{https://github.com/cs207group4/cs207-FinalProject}. If you have a GitHub account, you can simply open your terminal and type
 \newline
 {\tt git clone git@github.com:cs207group4/cs207-FinalProject.git} \newline
 
-Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file.
+Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file. \newline
 
 If you just want to use the library, you can download the single library file at \url{https://raw.githubusercontent.com/cs207group4/cs207-FinalProject/master/chemkin.py}
 
 \subsection{Dependencies}
 
-This package has several dependencies. These usually come standard with the Anaconda distribution, but are straightforward to install if you do not have them in your Python distribution. (Click on the individual package names to be directed to their website and installation instructions).  
+This package has several dependencies. These usually come standard with the Anaconda distribution, but are straightforward to install if you do not have them in your Python distribution. (Click on the individual package names to be directed to their website and installation instructions).
 \begin{itemize}
 \item \href{http://www.numpy.org/}{NumPy} v.1.11+
 \end{itemize}
 
 
 \subsection{Running the test suite}
-In order to run the test suite, you need to have \href{https://docs.pytest.org/en/latest/}{pytest} v. 3.00+ and \href{https://pypi.python.org/pypi/pytest-cov}{pytest-cov} v.2.5+ installed. Once you download the contents of the repository from GitHub, enter the directory and type {\tt pytest} into the terminal. The results of the test code will be printed out to the terminal. 
-  
+In order to run the test suite, you need to have \href{https://docs.pytest.org/en/latest/}{pytest} v. 3.00+ and \href{https://pypi.python.org/pypi/pytest-cov}{pytest-cov} v.2.5+ installed. Once you download the contents of the repository from GitHub, enter the directory and type {\tt pytest} into the terminal. The results of the test code will be printed out to the terminal.
+
 \section{Basic Usage and Examples}
 As an example of basic code usage, we consider the following system of elementary, irreversible reactions:
 
 \begin{enumerate}
-\item H + O$_2$ $\overset{k_1}{\rightarrow}$ OH + O 
-\item H$_2$ + O $\overset{k_2}{\rightarrow}$OH + H  
-\item H$_2$ + OH $\overset{k_3}{\rightarrow}$ H$_2$O + H 
+\item H + O$_2$ $\overset{k_1}{\rightarrow}$ OH + O
+\item H$_2$ + O $\overset{k_2}{\rightarrow}$OH + H
+\item H$_2$ + OH $\overset{k_3}{\rightarrow}$ H$_2$O + H
 \end{enumerate}
 
-Reaction 1 has an Arrhenius rate coefficient with $A = 3.52\times 10^{10}$ and $E = 7.14\times 10^4$. Reaction 2 has a modified Arrhenius rate coefficient with $A = 5.06\times 10^{-2}$, $b = 2.7$, and $E = 2.63\times10^4$. Finally, reaction 3 has a constant rate coefficient of $k_3 = 10^3$. 
+Reaction 1 has an Arrhenius rate coefficient with $A = 3.52\times 10^{10}$ and $E = 7.14\times 10^4$. Reaction 2 has a modified Arrhenius rate coefficient with $A = 5.06\times 10^{-2}$, $b = 2.7$, and $E = 2.63\times10^4$. Finally, reaction 3 has a constant rate coefficient of $k_3 = 10^3$.
 
 
 
@@ -142,7 +142,7 @@ Constant Reaction Coeffs: {`k': 1000.0, `R': 8.314}
 \end{lstlisting}
 
 \subsection{Computing reaction rates}
-Given the reaction data from a user-provided input file, the reaction rates can be computed for an arbitrary temperature and set of species concentrations. 
+Given the reaction data from a user-provided input file, the reaction rates can be computed for an arbitrary temperature and set of species concentrations.
 
 \begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
 >>>T = 1000 #K
@@ -152,6 +152,6 @@ array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
             -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
 \end{lstlisting}
 
-
+There are more use cases of our library, please refer to {\tt demo.ipynb}
 
 \end{document}

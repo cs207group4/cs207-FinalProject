@@ -180,7 +180,6 @@ class InputParser:
         """Return the number of chemical reactions."""
         return len(self.reactions)
 
-
 class ReactionCoeffs:
     ''' A class for reaction_coeffs
 
@@ -532,8 +531,3 @@ class chemkin:
             raise ValueError("ERROR: Temperature cannot be negative")
         self.set_rc_params(T=T)
         return self.reaction_rate(x)
-
-if __name__=="__main__":
-    rxn_system = chemkin.from_xml('rxns.xml')
-    print(rxn_system)
-    rxn_system.reaction_rate_T(np.ones(6), 1000.)

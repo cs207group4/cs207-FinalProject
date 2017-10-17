@@ -47,7 +47,7 @@ def test_construct():
     for t in [750,1500,2500]:
         reactions.set_rc_params(T=t)
         assert str(reactions.reaction_rate(x)) == str(expect[t])
-    reactions = chemkin.init_const_rc(v1,v2,[1,1,1],['X','Y','Z'])
+    reactions = chemkin.init_const_rc(v1,v2,[1,1,1],['A','B','X','Y','Z'])
     print(reactions)
 
 def test_str_repr():
@@ -59,7 +59,7 @@ def test_str_repr():
 
 def test_dimension_error():
     try:
-        reactions = chemkin.init_const_rc([[1,2],[1,2]],[[1,2],[1,2]],[1,1,1],['X','Y','Z'])
+        reactions = chemkin.init_const_rc([[1,2],[1,2]],[[1,2],[1,2]],[1,1,1],['A','B','X','Y','Z'])
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
