@@ -38,7 +38,7 @@ class InputParser:
         """
         INPUT
         =====
-        file_name: string
+        file_name: string, required
                    name of xml input file
 
         """
@@ -52,7 +52,7 @@ class InputParser:
 
     def get_species(self):
         """
-        Retrieves species array from xml file
+        Returns species array from xml file
         """
         try:
             species = self.raw.find('phase').find('speciesArray').text.strip().split()

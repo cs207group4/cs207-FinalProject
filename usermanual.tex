@@ -62,7 +62,7 @@ The \textbf{forward reaction rate coefficient} $k_j$ for each reaction is assume
 \end{enumerate}
 
 \subsection{Features}
-The package can solve for the reaction rates of a system with an arbitrary number of species and elementary, irreversible reactions. Reaction system can be either read from an xml file or input as NumPy arrays. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array.
+The package can solve for the reaction rates of a system of elementary, irreversible reactions. The number of reactions and species is arbitrary. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array. Rate coefficients and reaction progress rates can also be retrieved. 
 
 \section{Installation}
 
@@ -77,7 +77,7 @@ If you just want to use the library, you can download the single library file at
 
 \subsection{Dependencies}
 
-This package has several dependencies. These usually come standard with the Anaconda distribution, but are straightforward to install if you do not have them in your Python distribution. (Click on the individual package names to be directed to their website and installation instructions).
+This package has dependencies that usually come standard with the Anaconda distribution, but are straightforward to install if you do not have them in your Python distribution. (Click on the individual package names to be directed to their website and installation instructions).
 \begin{itemize}
 \item \href{http://www.numpy.org/}{NumPy} v.1.11+
 \end{itemize}
@@ -139,7 +139,32 @@ Arrhenius Reaction Coeffs: {`A': 35200000000.0, `E': 71400.0, `R': 8.314}
 modifiedArrhenius Reaction Coeffs: {`A': 0.0506, `b': 2.7, `E': 26300.0, `R': 8.314}
 Constant Reaction Coeffs: {`k': 1000.0, `R': 8.314}
 ]
+reaction types: [`Elementary', `Elementary', `Elementary']
+reversible: [`no', `no', `no']
 \end{lstlisting}
+
+\subsection{Computing rate coefficients}
+While the xml file provides the parameters for the functional form of the rate coefficient expression, a temperature (usually) has to be specified to compute the rate coefficient. Our package does this in the following manner:
+
+\begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
+ >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
+ >>> rc.set_params(T=1e2)
+ >>> rc.kval()
+    3003549.0889639612
+\end{lstlisting}
+
+
+\subsection{Computing progress rates}
+The progress rate values $w_i$ can be computed in the following manner:
+\begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
+>>>T = 1000 #K
+>>>x = np.array([1,1,1,1,1,1])
+>>> rxn_system.set_rc_params(T=1000)
+>>>rxn_system.progress_rate_T(x,T)
+array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
+            -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
+\end{lstlisting}
+
 
 \subsection{Computing reaction rates}
 Given the reaction data from a user-provided input file, the reaction rates can be computed for an arbitrary temperature and set of species concentrations.
@@ -148,8 +173,7 @@ Given the reaction data from a user-provided input file, the reaction rates can 
 >>>T = 1000 #K
 >>>x = np.array([1,1,1,1,1,1])
 >>>rxn_system.reaction_rate_T(x,T)
-array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
-            -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
+array([  6.55925729e+06,   2.69357993e+05,   1.00000000e+03])
 \end{lstlisting}
 
 There are more use cases of our library, please refer to {\tt demo.ipynb}

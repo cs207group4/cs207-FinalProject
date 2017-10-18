@@ -1,22 +1,29 @@
 class ReactionCoeffs:
-    ''' A class for reaction_coeffs
+    """
+    A class for computating reaction coefficients
 
-        Initialize by calling reaction_coeffs(type, {params})
-        Set params by calling set_params({params})
-        Get calculated k value by calling kval()
+    Initialize by calling reaction_coeffs(type, {params})
+    Set params by calling set_params({params})
+    Calculate k value by calling kval()
 
-        EXAMPLES
-        =========
-        >>> rc = ReactionCoeffs('Constant', k = 1e3)
-        >>> rc.kval()
-        1000.0
-        >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
-        >>> rc.set_params(T=1e2)
-        >>> rc.kval()
-        3003549.0889639612
-    '''
+    EXAMPLES
+    =========
+    >>> rc = ReactionCoeffs('Constant', k = 1e3)
+    >>> rc.kval()
+    1000.0
+    >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
+    >>> rc.set_params(T=1e2)
+    >>> rc.kval()
+    3003549.0889639612
+    """
 
     def __init__(self, type, **kwargs):
+        """
+        INPUT
+        =====
+        type: string, required
+              Type of the reaction rate coefficient of interest (e.g. "Constant", "Arrhenius", etc)
+        """
         if type not in ["Constant","Arrhenius","modifiedArrhenius"]:
             raise NotImplementedError('Rate coefficient type not supported yet! Must be constant, Arrhenius, or modified Arrhenius.')
         self.__rtype = str(type)
@@ -39,15 +46,24 @@ class ReactionCoeffs:
         return str(class_name)+'("'+self.__rtype+'"'+params_str+')'
 
     def __eq__(self,other):
-        ''' check if two coeffs are the same. They are same if k is the same...
-        '''
+        """
+        Check if two reaction rate coefficients are the same. They are same if the k values are equal.
+        """
         return self.kval() == other.kval()
 
     def __check_param_in(self, param_list):
-        '''
-        return None if not all params avaliable
-        else return a dict containing all avaliable params
-        '''
+        """
+        Returns dictionary of parameter values
+
+        INPUT
+        =====
+        param_list: iterable, required
+                    list of parameter namesof interest
+
+        RETURNS
+        =======
+        Dictionary of parameters in provided list (returns None if mismatch present between parameter list and instance attributes)
+        """
         param_dict = dict()
         for param in param_list:
             if param in self.__params:
@@ -57,7 +73,8 @@ class ReactionCoeffs:
         return param_dict
 
     def kval(self):
-        ''' A wrapper function
+        """
+        Computes reaction coefficient
 
         NOTES
         ==========
@@ -66,9 +83,8 @@ class ReactionCoeffs:
 
         RETURNS
         ==========
-        k: (real number) reaction coeffs.
-
-        '''
+        k: (real number) Reaction coefficient
+        """
         if self.__rtype == "Constant":
             params = self.__check_param_in(['k'])
             if params != None:
@@ -91,44 +107,55 @@ class ReactionCoeffs:
             raise NotImplementedError("Type not supported yet!")
 
     def __const(self,k):
-        ''' return constant coefficient
+        """
+        Return constant coefficient
 
         INPUTS
         =======
-        k: constant coefficient
+        k: float, required
+           constant reaction rate coefficient
 
         RETURNS
         ========
-        k constant coefficient
+        k: float
+           constant reaction rate coefficient
 
-
-        '''
+        """
 
         if k < 0:
             raise ValueError("k cannot be negative!")
         return k
 
     def __arr(self,A,E,T,R):
-        ''' return Arrhenius reaction rate coefficient
+        """
+        Return Arrhenius reaction rate coefficient
 
         INPUTS
         =======
-        A: Arrhenius prefactor  A. A  is strictly positive
-        E: Activation energy
-        T: Temperature. T must be positive (assuming a Kelvin scale)
-        R: Ideal gas constant
+        A: float, required
+           Arrhenius prefactor  A. A  is strictly positive
+        E: float, required
+           Activation energy
+        T: float, required
+           Temperature. T must be positive (assuming a Kelvin scale)
+        R: float, required
+           Ideal gas constant
 
 
         RETURNS
         ========
-        k: Arrhenius reaction rate coefficient
+        k: float
+           Arrhenius reaction rate coefficient
 
         NOTES
         ========
-        R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
+        R = 8.314 is the ideal gas constant. It should never be changed (except to convert units)
 
-        '''
+        """
         # R should never be changed
+        #for the first milestone we assume consistent units throughout
+        if R!=8.314:
+            raise ValueError("R should not be changed.")
         if A <= 0:
             raise ValueError("A must be positive!")
         if T <= 0:
@@ -142,15 +169,21 @@ class ReactionCoeffs:
             return np.inf
 
     def __mod_arr(self,A,b,E,T,R):
-        ''' return modified Arrhenius reaction rate coefficient
+        """
+        Return modified Arrhenius reaction rate coefficient
 
         INPUTS
         =======
-        A: Arrhenius prefactor  A. A  is strictly positive
-        b: Modified Arrhenius parameter b. b must be real
-        E: Activation energy
-        T: Temperature. T must be positive (assuming a Kelvin scale)
-        R: The ideal gas constant
+        A: float, required
+           Arrhenius prefactor  A. A  is strictly positive
+        b: float, required
+           Modified Arrhenius parameter b. b must be real
+        E: float, required
+           Activation energy
+        T: float, required
+           Temperature. T must be positive (assuming a Kelvin scale)
+        R: float, required
+           The ideal gas constant
 
 
         RETURNS
@@ -160,9 +193,7 @@ class ReactionCoeffs:
         NOTES
         ========
         R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
-
-
-        '''
+        """
         # R should never be changed
         if A <= 0:
             raise ValueError("A must be positive!")
