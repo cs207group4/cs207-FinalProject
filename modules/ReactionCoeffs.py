@@ -24,8 +24,6 @@ class ReactionCoeffs:
         type: string, required
               Type of the reaction rate coefficient of interest (e.g. "Constant", "Arrhenius", etc)
         """
-        if type not in ["Constant","Arrhenius","modifiedArrhenius"]:
-            raise NotImplementedError('Rate coefficient type not supported yet! Must be constant, Arrhenius, or modified Arrhenius.')
         self.__rtype = str(type)
         self.__params = kwargs
         if 'R' not in self.__params:
@@ -149,24 +147,21 @@ class ReactionCoeffs:
 
         NOTES
         ========
-        R = 8.314 is the ideal gas constant. It should never be changed (except to convert units)
+        R = 8.314 is the default ideal gas constant.
+        It should be positive (except to convert units)
 
         """
-        # R should never be changed
-        #for the first milestone we assume consistent units throughout
-        if R!=8.314:
-            raise ValueError("R should not be changed.")
-        if A <= 0:
-            raise ValueError("A must be positive!")
-        if T <= 0:
-            raise ValueError("T must be positive!")
 
-        # On overflow, return np.inf
-        try:
-            return A*np.exp(-E/(R*T))
-        except OverflowError:
-            print("WARNING: Overflow error")
-            return np.inf
+        if A < 0.0:
+            raise ValueError("A = {0:18.16e}:  Negative Arrhenius prefactor is prohibited!".format(A))
+
+        if T < 0.0:
+            raise ValueError("T = {0:18.16e}:  Negative temperatures are prohibited!".format(T))
+
+        if R < 0.0:
+            raise ValueError("R = {0:18.16e}:  Negative ideal gas constant is prohibited!".format(R))
+
+        return A * np.exp(-E / R / T)
 
     def __mod_arr(self,A,b,E,T,R):
         """
@@ -192,19 +187,15 @@ class ReactionCoeffs:
 
         NOTES
         ========
-        R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
+        R=8.314 is the default ideal gas constant
         """
-        # R should never be changed
-        if A <= 0:
-            raise ValueError("A must be positive!")
-        if T <= 0:
-            raise ValueError("T must be positive!")
-        if not isinstance(b, (float, int)):
-            raise ValueError("b must be real!")
+        if A < 0.0:
+            raise ValueError("A = {0:18.16e}:  Negative Arrhenius prefactor is prohibited!".format(A))
 
-        # On overflow, return np.inf
-        try:
-            return A*(T**b)*np.exp(-E/(R*T))
-        except OverflowError:
-            print("WARNING: Overflow error")
-            return np.inf
+        if T < 0.0:
+            raise ValueError("T = {0:18.16e}:  Negative temperatures are prohibited!".format(T))
+
+        if R < 0.0:
+            raise ValueError("R = {0:18.16e}:  Negative ideal gas constant is prohibited!".format(R))
+
+        return A * (T**b) * np.exp(-E / R / T)

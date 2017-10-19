@@ -53,11 +53,15 @@ class chemkin:
         self.nu_prod = np.array(nu_prod)
         if self.nu_prod.shape != self.nu_react.shape or len(reaction_coeffs) != self.nu_prod.shape[1]:
             raise ValueError("Dimensions not consistent!")
+        if np.any(self.nu_react<0.0) or np.any(self.nu_prod<0.0):
+            raise ValueError("Negative stoichiometric coefficients are prohibited!")
         self.rc_list = reaction_coeffs
         self.species = species
         self.equations = equations
         self.rxn_types = rxn_types
         self.reversible = reversible
+        if np.any(np.array(self.rxn_types)!='Elementary') or np.any(np.array(self.reversible) =='yes'):
+            raise NotImplementedError('Only elementary, irreversible reactions accepted')
 
     @classmethod
     def from_xml(cls, filename):
@@ -140,14 +144,12 @@ class chemkin:
 
         '''
 
-        x = np.array(x)
+        x = np.array(x).reshape(-1,1)
         if len(x) != self.nu_prod.shape[0]:
             raise ValueError("ERROR: The concentration vector x must be of length N, where N is the number of species")
         #check that concentrations are all non-negative:
         if np.any(x<0):
             raise ValueError("ERROR: All the species concentrations must be non-negative")
-        #make the shape compatible with what NumPy needs for vectorized operations
-        x = np.reshape(x, (len(x), 1))
 
         return np.array([rc.kval() for rc in self.rc_list]).astype(float) * np.product(x ** self.nu_react, axis = 0)
 
@@ -187,11 +189,5 @@ class chemkin:
         Array of length N containing reaction rates for each species
 
         """
-
-        if T <= 0:
-            raise ValueError("ERROR: Temperature must be positive")
         self.set_rc_params(T=T)
-        if np.any(np.array(self.rxn_types)!='Elementary') or np.any(np.array(self.reversible) =='yes'):
-            raise NotImplementedError('Only elementary, irreversible reactions accepted')
-        else:
-            return self.reaction_rate(x)
+        return self.reaction_rate(x)

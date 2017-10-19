@@ -85,10 +85,7 @@ class InputParser:
                 except AttributeError:
                     print('ERROR: Value of k must be provided for constant rate coefficient')
                     raise
-                if k<=0:
-                    raise ValueError('k must be non-negative')
-                else:
-                    reaction_dict['rateCoeffParams']['k'] = k
+                reaction_dict['rateCoeffParams']['k'] = k
 
             elif rc_.find('Arrhenius') is not None:
                 reaction_dict['rateCoeffParams']['type'] = 'Arrhenius'
@@ -98,11 +95,8 @@ class InputParser:
                 except AttributeError:
                     print('ERROR: Values of A and E must be provided for Arrhenius rate coefficient')
                     raise
-                if A <=0 or E<0:
-                    raise ValueError('A must always be positive and E must be non-negative')
-                else:
-                    reaction_dict['rateCoeffParams']['A'] = A
-                    reaction_dict['rateCoeffParams']['E'] = E
+                reaction_dict['rateCoeffParams']['A'] = A
+                reaction_dict['rateCoeffParams']['E'] = E
 
             elif rc_.find('modifiedArrhenius') is not None:
                 reaction_dict['rateCoeffParams']['type'] = 'modifiedArrhenius'
@@ -113,12 +107,9 @@ class InputParser:
                 except AttributeError:
                     print('ERROR: Values of A, b, and E must be provided for modified Arrhenius rate coefficient')
                     raise
-                if A <=0 or E<0 or np.iscomplex(b):
-                    raise ValueError('ERROR: A must always be positive, E must be non-negative, and b must be real')
-                else:
-                    reaction_dict['rateCoeffParams']['A'] = A
-                    reaction_dict['rateCoeffParams']['b'] = b
-                    reaction_dict['rateCoeffParams']['E'] = E
+                reaction_dict['rateCoeffParams']['A'] = A
+                reaction_dict['rateCoeffParams']['b'] = b
+                reaction_dict['rateCoeffParams']['E'] = E
             else:
                 raise NotImplementedError('This type of reaction rate coefficient has not been implemented. Current supported types are constant, Arrhenius, and modified Arrhenius.')
 
@@ -159,8 +150,6 @@ class InputParser:
         nu_prod = np.zeros((len(self.species), len(self.reactions)), dtype = int)
 
         for i, reaction in enumerate(self.reactions):
-            if not (reaction['reversible'] == 'no' and reaction['type'] == 'Elementary'):
-                raise NotImplementedError('Reactions that are reversible or non-elementary are not yet handled by this program.')
             for specie, stoi in reaction['reactants'].items():
                 nu_react[self.species.index(specie), i] = stoi
             for specie, stoi in reaction['products'].items():
@@ -179,7 +168,6 @@ class InputParser:
     def __len__(self):
         """Return the number of chemical reactions."""
         return len(self.reactions)
-
 
 class ReactionCoeffs:
     """
@@ -207,8 +195,6 @@ class ReactionCoeffs:
         type: string, required
               Type of the reaction rate coefficient of interest (e.g. "Constant", "Arrhenius", etc)
         """
-        if type not in ["Constant","Arrhenius","modifiedArrhenius"]:
-            raise NotImplementedError('Rate coefficient type not supported yet! Must be constant, Arrhenius, or modified Arrhenius.')
         self.__rtype = str(type)
         self.__params = kwargs
         if 'R' not in self.__params:
@@ -332,24 +318,21 @@ class ReactionCoeffs:
 
         NOTES
         ========
-        R = 8.314 is the ideal gas constant. It should never be changed (except to convert units)
+        R = 8.314 is the default ideal gas constant.
+        It should be positive (except to convert units)
 
         """
-        # R should never be changed
-        #for the first milestone we assume consistent units throughout
-        if R!=8.314:
-            raise ValueError("R should not be changed.")
-        if A <= 0:
-            raise ValueError("A must be positive!")
-        if T <= 0:
-            raise ValueError("T must be positive!")
 
-        # On overflow, return np.inf
-        try:
-            return A*np.exp(-E/(R*T))
-        except OverflowError:
-            print("WARNING: Overflow error")
-            return np.inf
+        if A < 0.0:
+            raise ValueError("A = {0:18.16e}:  Negative Arrhenius prefactor is prohibited!".format(A))
+
+        if T < 0.0:
+            raise ValueError("T = {0:18.16e}:  Negative temperatures are prohibited!".format(T))
+
+        if R < 0.0:
+            raise ValueError("R = {0:18.16e}:  Negative ideal gas constant is prohibited!".format(R))
+
+        return A * np.exp(-E / R / T)
 
     def __mod_arr(self,A,b,E,T,R):
         """
@@ -375,22 +358,18 @@ class ReactionCoeffs:
 
         NOTES
         ========
-        R=8.314 is the ideal gas constant. It should never be changed (except to convert units)
+        R=8.314 is the default ideal gas constant
         """
-        # R should never be changed
-        if A <= 0:
-            raise ValueError("A must be positive!")
-        if T <= 0:
-            raise ValueError("T must be positive!")
-        if not isinstance(b, (float, int)):
-            raise ValueError("b must be real!")
+        if A < 0.0:
+            raise ValueError("A = {0:18.16e}:  Negative Arrhenius prefactor is prohibited!".format(A))
 
-        # On overflow, return np.inf
-        try:
-            return A*(T**b)*np.exp(-E/(R*T))
-        except OverflowError:
-            print("WARNING: Overflow error")
-            return np.inf
+        if T < 0.0:
+            raise ValueError("T = {0:18.16e}:  Negative temperatures are prohibited!".format(T))
+
+        if R < 0.0:
+            raise ValueError("R = {0:18.16e}:  Negative ideal gas constant is prohibited!".format(R))
+
+        return A * (T**b) * np.exp(-E / R / T)
 
 
 class chemkin:
@@ -448,11 +427,15 @@ class chemkin:
         self.nu_prod = np.array(nu_prod)
         if self.nu_prod.shape != self.nu_react.shape or len(reaction_coeffs) != self.nu_prod.shape[1]:
             raise ValueError("Dimensions not consistent!")
+        if np.any(self.nu_react<0.0) or np.any(self.nu_prod<0.0):
+            raise ValueError("Negative stoichiometric coefficients are prohibited!")
         self.rc_list = reaction_coeffs
         self.species = species
         self.equations = equations
         self.rxn_types = rxn_types
         self.reversible = reversible
+        if np.any(np.array(self.rxn_types)!='Elementary') or np.any(np.array(self.reversible) =='yes'):
+            raise NotImplementedError('Only elementary, irreversible reactions accepted')
 
     @classmethod
     def from_xml(cls, filename):
@@ -535,14 +518,12 @@ class chemkin:
 
         '''
 
-        x = np.array(x)
+        x = np.array(x).reshape(-1,1)
         if len(x) != self.nu_prod.shape[0]:
             raise ValueError("ERROR: The concentration vector x must be of length N, where N is the number of species")
         #check that concentrations are all non-negative:
         if np.any(x<0):
             raise ValueError("ERROR: All the species concentrations must be non-negative")
-        #make the shape compatible with what NumPy needs for vectorized operations
-        x = np.reshape(x, (len(x), 1))
 
         return np.array([rc.kval() for rc in self.rc_list]).astype(float) * np.product(x ** self.nu_react, axis = 0)
 
@@ -582,11 +563,5 @@ class chemkin:
         Array of length N containing reaction rates for each species
 
         """
-
-        if T <= 0:
-            raise ValueError("ERROR: Temperature must be positive")
         self.set_rc_params(T=T)
-        if np.any(np.array(self.rxn_types)!='Elementary') or np.any(np.array(self.reversible) =='yes'):
-            raise NotImplementedError('Only elementary, irreversible reactions accepted')
-        else:
-            return self.reaction_rate(x)
+        return self.reaction_rate(x)

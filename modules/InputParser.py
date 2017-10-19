@@ -85,10 +85,7 @@ class InputParser:
                 except AttributeError:
                     print('ERROR: Value of k must be provided for constant rate coefficient')
                     raise
-                if k<=0:
-                    raise ValueError('k must be non-negative')
-                else:
-                    reaction_dict['rateCoeffParams']['k'] = k
+                reaction_dict['rateCoeffParams']['k'] = k
 
             elif rc_.find('Arrhenius') is not None:
                 reaction_dict['rateCoeffParams']['type'] = 'Arrhenius'
@@ -98,11 +95,8 @@ class InputParser:
                 except AttributeError:
                     print('ERROR: Values of A and E must be provided for Arrhenius rate coefficient')
                     raise
-                if A <=0 or E<0:
-                    raise ValueError('A must always be positive and E must be non-negative')
-                else:
-                    reaction_dict['rateCoeffParams']['A'] = A
-                    reaction_dict['rateCoeffParams']['E'] = E
+                reaction_dict['rateCoeffParams']['A'] = A
+                reaction_dict['rateCoeffParams']['E'] = E
 
             elif rc_.find('modifiedArrhenius') is not None:
                 reaction_dict['rateCoeffParams']['type'] = 'modifiedArrhenius'
@@ -113,12 +107,9 @@ class InputParser:
                 except AttributeError:
                     print('ERROR: Values of A, b, and E must be provided for modified Arrhenius rate coefficient')
                     raise
-                if A <=0 or E<0 or np.iscomplex(b):
-                    raise ValueError('ERROR: A must always be positive, E must be non-negative, and b must be real')
-                else:
-                    reaction_dict['rateCoeffParams']['A'] = A
-                    reaction_dict['rateCoeffParams']['b'] = b
-                    reaction_dict['rateCoeffParams']['E'] = E
+                reaction_dict['rateCoeffParams']['A'] = A
+                reaction_dict['rateCoeffParams']['b'] = b
+                reaction_dict['rateCoeffParams']['E'] = E
             else:
                 raise NotImplementedError('This type of reaction rate coefficient has not been implemented. Current supported types are constant, Arrhenius, and modified Arrhenius.')
 
@@ -159,8 +150,6 @@ class InputParser:
         nu_prod = np.zeros((len(self.species), len(self.reactions)), dtype = int)
 
         for i, reaction in enumerate(self.reactions):
-            if not (reaction['reversible'] == 'no' and reaction['type'] == 'Elementary'):
-                raise NotImplementedError('Reactions that are reversible or non-elementary are not yet handled by this program.')
             for specie, stoi in reaction['reactants'].items():
                 nu_react[self.species.index(specie), i] = stoi
             for specie, stoi in reaction['products'].items():
