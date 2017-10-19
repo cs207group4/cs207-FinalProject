@@ -164,3 +164,13 @@ def test_bad_x():
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
+
+def test_long():
+    rxns = chemkin.from_xml('test_xml/rxnset_long.xml')
+    x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
+    T = 1500
+    print(rxns.reaction_rate_T(x, T))
+    expect = np.array([ -7.10942556e+12,  -1.58164670e+13,   2.20952666e+13,
+        -1.65522031e+12,   1.12504921e+13,   0.00000000e+00,
+         1.66470929e+13,  -2.54117388e+13])
+    assert str(rxns.reaction_rate_T(x, T)) == str(expect)
