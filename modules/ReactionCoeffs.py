@@ -14,7 +14,7 @@ class ReactionCoeffs:
     >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
     >>> rc.set_params(T=1e2)
     >>> rc.kval()
-    3003549.0889639612
+    3003549.0889639617
     """
 
     def __init__(self, type, **kwargs):

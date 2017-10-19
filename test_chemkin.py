@@ -58,7 +58,7 @@ def test_construct():
         2,1,0.5,1,1
     ]).reshape(-1,1)
     expect = dict()
-    expect[750] = np.array([-3607077.87280406, -5613545.18362079,  9220623.05642485,
+    expect[750] = np.array([-3607077.87280407, -5613545.1836208,  9220623.05642486,
         2006467.31081673, -2006467.31081673])
     expect[1500] = np.array([ -2.81117621e+08,  -2.85597559e+08,   5.66715180e+08,
          4.47993847e+06,  -4.47993847e+06])
@@ -110,8 +110,8 @@ def test_construct_nonelementary():
          6.17593098e+06,  -6.17593098e+06])
     rxn_types = ['Elementary', 'Hello Kitty', 'Elementary', 'Elementary', 'Elementary']
     reversible = ['no']*5
-    reactions = chemkin(v1,v2,rc_list,rxn_types, reversible)
     try:
+        reactions = chemkin(v1,v2,rc_list,rxn_types, reversible)
         reactions.reaction_rate_T(np.ones(5), 1000)
     except NotImplementedError as e:
         assert type(e)==NotImplementedError
