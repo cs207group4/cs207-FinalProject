@@ -114,3 +114,6 @@ venv.bak/
 .log
 .aux
 .synctex.gz
+
+#other files
+.DS_Store
