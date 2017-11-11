@@ -1,13 +1,13 @@
 '''Thermodynamics and Thermochemistry for Chemical Kinetics
-This module contains a thermochem class with methods for 
+This module contains a BackwardCoeffs class with methods for 
 computing the backward reaction rates for a set of 
 reversible, elementary reactions.
 '''
 
 import numpy as np
 
-class thermochem:
-    '''Methods for calculating the backward reaction rate.
+class BackwardCoeffs:
+    '''Methods for calculating the backward reaction rate coefficients.
     Cp_over_R: Returns specific heat of each specie given by 
                the NASA polynomials.
     H_over_RT:  Returns the enthalpy of each specie given by 
@@ -16,11 +16,6 @@ class thermochem:
               the NASA polynomials.
     backward_coeffs:  Returns the backward reaction rate 
                       coefficient for reach reaction.
-    Please see the notes in each routine for clarifications and 
-    warnings.  You will need to customize these methods (and 
-    likely the entire class) to suit your own code base.  
-    Nevertheless, it is hoped that you will find these methods 
-    to be of some use.
     '''
 
     def __init__(self, nu_react, nu_prod, species, sql):
