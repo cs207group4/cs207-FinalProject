@@ -7,10 +7,10 @@ import sqlite3
 import pandas as pd
 
 class SQLBuilder:
-    def __init__(self, file_name, sql_name=None):
+    def __init__(self, file_name, sql_name=None, save_xml=False):
         self.data = None
         if file_name[-4:] == '.txt':
-            self.raw2sql(file_name, sql_name)
+            self.raw2sql(file_name, sql_name, save_xml)
         elif file_name[-4:] == '.xml':
             self.xml2sql(file_name, sql_name)
     
@@ -155,10 +155,10 @@ class SQLBuilder:
         db.close()
         return self
     
-    def raw2sql(self, raw_name, sql_name=None):
+    def raw2sql(self, raw_name, sql_name=None, save_xml=False):
         if sql_name is None:
             sql_name = raw_name[:-4] + '.sqlite'
-        self.raw2data(raw_name)
+        self.raw2data(raw_name, save_xml)
         self.data2sql(self.data, sql_name)
         return self
     
