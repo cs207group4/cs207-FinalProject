@@ -34,28 +34,28 @@ class SQLParser:
         db.close()
         return dfs
     
-    def get_coeffs(self, species, temp):
-        '''Return coeffs of a species at temp'''
+    def get_coeffs(self, species, T):
+        '''Return coeffs of a species at T'''
         if not species in self.data:
             raise ValueError('Species not found in the provided NASA polynomials database.')
         data = self.data[species]
-        if 'low' in data and data['low']['Ts'][0] <= temp and temp <= data['low']['Ts'][1]:
+        if 'low' in data and data['low']['Ts'][0] <= T and T <= data['low']['Ts'][1]:
             return data['low']['coeffs']
-        elif 'high' in data and data['high']['Ts'][0] <= temp and temp <= data['high']['Ts'][1]:
+        elif 'high' in data and data['high']['Ts'][0] < T and T <= data['high']['Ts'][1]:
             return data['high']['coeffs']
         else:
             raise ValueError('Temperature not supported for the species in the \
             provided NASA polynomials database.')
             
-    def get_multi_coeffs(self, species_array, temp):
-        '''Return coeffs of species from species_array at temp'''
-        return np.array([self.get_coeffs(species, temp) for species in species_array])
+    def get_multi_coeffs(self, species_array, T):
+        '''Return coeffs of species from species_array at T'''
+        return np.array([self.get_coeffs(species, T) for species in species_array])
     
-    def get_species(self, temp):
-        '''Return a list of supported species at temp'''
+    def get_species(self, T):
+        '''Return a list of supported species at T'''
         species_list = []
         for species, data in self.data.items():
-            if ('low' in data and data['low']['Ts'][0] <= temp and temp <= data['low']['Ts'][1]) \
-            or ('high' in data and data['high']['Ts'][0] <= temp and temp <= data['high']['Ts'][1]):
+            if ('low' in data and data['low']['Ts'][0] <= T and T <= data['low']['Ts'][1]) \
+            or ('high' in data and data['high']['Ts'][0] < T and T <= data['high']['Ts'][1]):
                 species_list.append(species)
         return species_list
