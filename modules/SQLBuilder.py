@@ -169,7 +169,7 @@ class SQLBuilder:
         self.data2sql(self.data, sql_name)
         return self
     
-    def viz_tables(self, sql_name):
+    def sql2pandas(self, sql_name):
         db = sqlite3.connect(sql_name)
         cursor = db.cursor()
         cols = ['SPECIES_NAME', 'TLOW', 'THIGH', 'COEFF_1', 'COEFF_2', 'COEFF_3', \
