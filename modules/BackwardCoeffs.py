@@ -38,7 +38,7 @@ class BackwardCoeffs:
         
         self.p0 = 1.0e+05 # Pa
         self.R = 8.3144598 # J / mol / K
-        self.gamma = np.sum(self.rxnset.nuij, axis=0)
+        self.gamma = np.sum(self.nu, axis=0)
 
     def Cp_over_R(self, T):
         
@@ -90,6 +90,6 @@ class BackwardCoeffs:
         fact = self.p0 / self.R / T
 
         # Ke
-        kb = fact**self.gamma * np.exp(delta_G_over_RT)
+        ke = fact**self.gamma * np.exp(delta_G_over_RT)
 
-        return kf / kb
+        return kf / ke
