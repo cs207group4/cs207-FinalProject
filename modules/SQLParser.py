@@ -35,7 +35,7 @@ class SQLParser:
         return dfs
     
     def get_coeffs(self, species, temp):
-        '''Return coeffs of species at temp'''
+        '''Return coeffs of a species at temp'''
         if not species in self.data:
             raise ValueError('Species not found in the provided NASA polynomials database.')
         data = self.data[species]
@@ -46,6 +46,10 @@ class SQLParser:
         else:
             raise ValueError('Temperature not supported for the species in the \
             provided NASA polynomials database.')
+            
+    def get_multi_coeffs(self, species_array, temp):
+        '''Return coeffs of species from species_array at temp'''
+        return np.array([self.get_coeffs(species, temp) for species in species_array])
     
     def get_species(self, temp):
         '''Return a list of supported species at temp'''
