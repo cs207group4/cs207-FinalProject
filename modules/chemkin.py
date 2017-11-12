@@ -1,4 +1,9 @@
 import numpy as np
+from InputParser import InputParser
+from SQLParser import SQLParser
+from ReactionCoeffs import ReactionCoeffs
+from BackwardCoeffs import BackwardCoeffs
+
 
 class chemkin:
 

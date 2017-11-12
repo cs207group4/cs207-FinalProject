@@ -376,7 +376,6 @@ class ReactionCoeffs:
 
 import numpy as np
 
-
 class chemkin:
 
     '''
