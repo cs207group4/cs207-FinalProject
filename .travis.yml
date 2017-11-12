@@ -4,6 +4,7 @@ python:
 before_install:
     - pip install pytest pytest-cov
     - pip install coveralls
+    - pip install pandas
 before_script:
     # make sure we are testing the newest chemkin.py
     - sh make_chemkin.sh
