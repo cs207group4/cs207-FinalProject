@@ -44,8 +44,8 @@ class SQLParser:
         elif 'high' in data and data['high']['Ts'][0] < T and T <= data['high']['Ts'][1]:
             return data['high']['coeffs']
         else:
-            raise ValueError('Temperature not supported for the species in the \
-            provided NASA polynomials database.')
+            raise ValueError\
+            ('Temperature not supported for the species in the provided NASA polynomials database.')
             
     def get_multi_coeffs(self, species_array, T):
         '''Return coeffs of species from species_array at T'''

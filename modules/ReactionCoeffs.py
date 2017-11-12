@@ -1,3 +1,5 @@
+import numpy as np
+
 class ReactionCoeffs:
     """
     A class for computating reaction coefficients

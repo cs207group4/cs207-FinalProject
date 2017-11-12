@@ -77,6 +77,9 @@ class BackwardCoeffs:
 
     def backward_coeffs(self, kf, T):
         
+        if len(kf) == 0:
+            return np.array([])
+        
         self.coeffs = self.sql.get_multi_coeffs(self.species, T)
 
         # Change in enthalpy and entropy for each reaction
