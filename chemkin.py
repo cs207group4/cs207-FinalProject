@@ -375,6 +375,167 @@ class ReactionCoeffs:
 
 
 import numpy as np
+import sqlite3
+import pandas as pd
+
+class SQLParser:
+    def __init__(self, sql_name):
+        self.data = None
+        self.sql2data(sql_name)
+    
+    def sql2data(self, sql_name):
+        db = sqlite3.connect(sql_name)
+        cursor = db.cursor()
+        data = dict()
+        for row in cursor.execute('''SELECT * FROM LOW''').fetchall():
+            data[row[0]] = {'low':{'Ts':row[1:3], 'coeffs':row[3:]}}
+        for row in cursor.execute('''SELECT * FROM HIGH''').fetchall():
+            if row[0] not in data:
+                data[row[0]] = {'high':{'Ts':row[1:3], 'coeffs':row[3:]}}
+            else:
+                data[row[0]]['high'] = {'Ts':row[1:3], 'coeffs':row[3:]}
+        db.close()
+        self.data = data
+        return self
+    
+    def sql2pandas(self, sql_name):
+        db = sqlite3.connect(sql_name)
+        cursor = db.cursor()
+        cols = ['SPECIES_NAME', 'TLOW', 'THIGH', 'COEFF_1', 'COEFF_2', 'COEFF_3', \
+                'COEFF_4', 'COEFF_5', 'COEFF_6', 'COEFF_7']
+        queries = ['''SELECT * FROM LOW''', '''SELECT * FROM HIGH''']
+        qs = [cursor.execute(query).fetchall() for query in queries]
+        dfs = [pd.DataFrame.from_items([(col_name, [col[i] for col in q]) \
+                                        for i, col_name in enumerate(cols)]) for q in qs]
+        db.close()
+        return dfs
+    
+    def get_coeffs(self, species, T):
+        '''Return coeffs of a species at T'''
+        if not species in self.data:
+            raise ValueError('Species not found in the provided NASA polynomials database.')
+        data = self.data[species]
+        if 'low' in data and data['low']['Ts'][0] <= T and T <= data['low']['Ts'][1]:
+            return data['low']['coeffs']
+        elif 'high' in data and data['high']['Ts'][0] < T and T <= data['high']['Ts'][1]:
+            return data['high']['coeffs']
+        else:
+            raise ValueError\
+            ('Temperature not supported for the species in the provided NASA polynomials database.')
+            
+    def get_multi_coeffs(self, species_array, T):
+        '''Return coeffs of species from species_array at T'''
+        return np.array([self.get_coeffs(species, T) for species in species_array])
+    
+    def get_species(self, T):
+        '''Return a list of supported species at T'''
+        species_list = []
+        for species, data in self.data.items():
+            if ('low' in data and data['low']['Ts'][0] <= T and T <= data['low']['Ts'][1]) \
+            or ('high' in data and data['high']['Ts'][0] < T and T <= data['high']['Ts'][1]):
+                species_list.append(species)
+        return species_list
+
+'''Thermodynamics and Thermochemistry for Chemical Kinetics
+This module contains a BackwardCoeffs class with methods for 
+computing the backward reaction rates for a set of 
+reversible, elementary reactions.
+'''
+
+import numpy as np
+
+class BackwardCoeffs:
+    '''Methods for calculating the backward reaction rate coefficients.
+    Cp_over_R: Returns specific heat of each specie given by 
+               the NASA polynomials.
+    H_over_RT:  Returns the enthalpy of each specie given by 
+                the NASA polynomials.
+    S_over_R: Returns the entropy of each specie given by 
+              the NASA polynomials.
+    backward_coeffs:  Returns the backward reaction rate 
+                      coefficient for reach reaction.
+    '''
+
+    def __init__(self, nu_react, nu_prod, species, sql):
+        '''
+        INPUT
+        =====
+        nu_prod: Array of integers, required
+                 N X M array of stoichiometric coefficients for products (N species, M reactions)
+        nu_react: Array of integers, required
+                 N x M array of stoichiometric coefficients for reactants
+        species: Array of strings, required
+                 List or array of length N providing the species
+        sql: Instance of SQLParser, required
+        
+        '''
+        self.nu = nu_prod - nu_react
+        self.species = species
+        self.sql = sql
+        self.coeffs = None
+        
+        self.p0 = 1.0e+05 # Pa
+        self.R = 8.3144598 # J / mol / K
+        self.gamma = np.sum(self.nu, axis=0)
+
+    def Cp_over_R(self, T):
+        
+        if self.coeffs is None:
+            self.coeffs = self.sql.get_multi_coeffs(self.species, T)
+        a = self.coeffs
+
+        Cp_R = (a[:,0] + a[:,1] * T + a[:,2] * T**2.0 
+                + a[:,3] * T**3.0 + a[:,4] * T**4.0)
+
+        return Cp_R
+
+    def H_over_RT(self, T):
+        
+        if self.coeffs is None:
+            self.coeffs = self.sql.get_multi_coeffs(self.species, T)
+        a = self.coeffs
+
+        H_RT = (a[:,0] + a[:,1] * T / 2.0 + a[:,2] * T**2.0 / 3.0 
+                + a[:,3] * T**3.0 / 4.0 + a[:,4] * T**4.0 / 5.0 
+                + a[:,5] / T)
+
+        return H_RT
+               
+
+    def S_over_R(self, T):
+
+        if self.coeffs is None:
+            self.coeffs = self.sql.get_multi_coeffs(self.species, T)
+        a = self.coeffs
+
+        S_R = (a[:,0] * np.log(T) + a[:,1] * T + a[:,2] * T**2.0 / 2.0 
+               + a[:,3] * T**3.0 / 3.0 + a[:,4] * T**4.0 / 4.0 + a[:,6])
+
+        return S_R
+
+    def backward_coeffs(self, kf, T):
+        
+        if len(kf) == 0:
+            return np.array([])
+        
+        self.coeffs = self.sql.get_multi_coeffs(self.species, T)
+
+        # Change in enthalpy and entropy for each reaction
+        delta_H_over_RT = np.dot(self.nu.T, self.H_over_RT(T))
+        delta_S_over_R = np.dot(self.nu.T, self.S_over_R(T))
+
+        # Negative of change in Gibbs free energy for each reaction 
+        delta_G_over_RT = delta_S_over_R - delta_H_over_RT
+
+        # Prefactor in Ke
+        fact = self.p0 / self.R / T
+
+        # Ke
+        ke = fact**self.gamma * np.exp(delta_G_over_RT)
+
+        return kf / ke
+
+import numpy as np
 
 class chemkin:
 
