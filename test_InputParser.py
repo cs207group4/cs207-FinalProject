@@ -6,11 +6,6 @@ def test_not_implement():
     except NotImplementedError as e:
         assert type(e) == NotImplementedError
         print(e)
-    try:
-        reactions = chemkin.from_xml('test_xml/rxns_bad_not_implement_reverse.xml')
-    except NotImplementedError as e:
-        assert type(e) == NotImplementedError
-        print(e)
 
 def test_bad_reactant():
     """test that input parser correctly handles reactants not matching the species array"""
