@@ -64,14 +64,15 @@ def test_construct():
          4.47993847e+06,  -4.47993847e+06])
     expect[2500] = np.array([ -1.80426143e+09,  -1.81043736e+09,   3.61469878e+09,
          6.17593098e+06,  -6.17593098e+06])
-    rxn_types = ['Elementary']*5
-    reversible = ['no']*5
-    reactions = chemkin(v1,v2,rc_list,rxn_types, reversible)
+    rxn_types = ['Elementary']*3
+    reversible = np.zeros(3).astype(bool)
+    species = ['O','OH','H','H2O','O2']
+    reactions = chemkin(v1,v2,rc_list,rxn_types, reversible, species)
 
     for t in [750,1500,2500]:
         reactions.set_rc_params(T=t)
         assert str(reactions.reaction_rate(x)) == str(expect[t])
-    reactions = chemkin.init_const_rc(v1,v2,[1,1,1],['Elementary']*5, ['no']*5, ['A','B','X','Y','Z'])
+    reactions = chemkin.init_const_rc(v1,v2,[1,1,1],['Elementary']*5, reversible, species)
     print(reactions)
 
 def test_construct_nonelementary():
