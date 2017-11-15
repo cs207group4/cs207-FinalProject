@@ -28,6 +28,7 @@ setup(
 
     # Author details
     author='CS207 Group4',
+    author_email = 'zzy8200@gmail.com',
 
     # Choose your license
     license='GPLv3',
@@ -45,7 +46,7 @@ setup(
 
     keywords='sample setuptools development',
 
-    packages=find_packages(exclude=['demo_notebook', 'docs', 'tests']),
+    packages= ['pychemkin'],
 
     install_requires=['numpy','scipy','pandas','bs4'],
 
@@ -53,9 +54,8 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    tests_require = ['pytest','coverage']
-    
-    package_data={
-        'sql_file': ['pychemkin/data/thermo30.sqlite'],
-    },
+    setup_requires = ['pytest-runner'],
+    tests_require = ['pytest','coverage'],
+
+    include_package_data=True
 )

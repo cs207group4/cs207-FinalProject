@@ -66,8 +66,8 @@ def test_repr():
     test override of __repr__ function
     """
     reactions = test_from_xml()
-    assert repr(reactions)=="chemkin('tests/test_xml/rxns.xml', sql_name = 'pychemkin/data/thermo30.sqlite')"
-
+    assert repr(reactions).find("chemkin('tests/test_xml/rxns.xml', sql_name ") >= 0
+    print(repr(reactions))
 
 def test_dimension_error():
     """
