@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from pychemkin import *
+from pychemkin import InputParser, SQLParser, BackwardCoeffs, ReactionCoeffs
 
 def test_CPcalc_single():
     ip = InputParser('tests/test_xml/rxns_singlereversible.xml')

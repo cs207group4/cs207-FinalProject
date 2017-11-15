@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-from pychemkin import *
+from pychemkin import InputParser
 
 
 def test_correct():

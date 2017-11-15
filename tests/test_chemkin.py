@@ -1,5 +1,5 @@
 #change this once we rearrange directory structure
-from pychemkin import *
+from pychemkin import chemkin
 import numpy as np
 
 def test_not_implement():
