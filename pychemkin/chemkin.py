@@ -24,7 +24,7 @@ class chemkin:
      - _set_rc_params(T=..., R=..., A=...): internal method to set params of reaction coeffs
     EXAMPLES
     =========
-    >>> chem = chemkin("tests/test_xml/rxns.xml", sql_name = "pychemkin/data/thermo30.sqlite")
+    >>> chem = chemkin("tests/test_xml/rxns.xml", sql_name = "pychemkin/data/thermo.sqlite")
     Finished reading xml input file
     >>> print(chem.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
@@ -46,7 +46,7 @@ class chemkin:
         
         if sql_name==None:
             here = path.abspath(path.dirname(__file__))
-            sql_name = path.join(here, 'data/thermo30.sqlite')
+            sql_name = path.join(here, 'data/thermo.sqlite')
 
         self.sql_name = sql_name
         sql = SQLParser(sql_name)

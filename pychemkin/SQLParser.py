@@ -13,7 +13,7 @@ class SQLParser:
 
     EXAMPLES
     =========
-    >>> parser = SQLParser('pychemkin/data/thermo30.sqlite')
+    >>> parser = SQLParser('pychemkin/data/thermo.sqlite')
     >>> parser.get_multi_coeffs(['O','O2'], 700)
     array([[  3.16826710e+00,  -3.27931884e-03,   6.64306396e-06,
              -6.12806624e-09,   2.11265971e-12,   2.91222592e+04,
