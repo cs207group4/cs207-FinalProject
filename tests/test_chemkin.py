@@ -1,5 +1,6 @@
 #change this once we rearrange directory structure
 from pychemkin import *
+import numpy as np
 
 def test_not_implement():
     """Test that input parser correctly handles reaction types and rate coefficients that are not implemented"""
