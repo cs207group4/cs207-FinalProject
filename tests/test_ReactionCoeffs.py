@@ -1,4 +1,4 @@
-from pychemkin import *
+from pychemkin import ReactionCoeffs
 
 
 def test_str():

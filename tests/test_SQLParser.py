@@ -1,4 +1,4 @@
-from pychemkin import *
+from pychemkin import SQLParser
 
 def test_databasexistence():
     '''
