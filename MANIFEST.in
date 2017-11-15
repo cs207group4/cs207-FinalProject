@@ -1,2 +1,2 @@
 include pychemkin/data/thermo30.sqlite
-inclue PACKAGE_DESCRIPTION.rst
+include PACKAGE_DESCRIPTION.rst
