@@ -171,7 +171,7 @@ class SQLBuilder:
         self.xml2data(xml_name)
         self.data2sql(self.data, sql_name)
         return self
-    
+    """
     #do we use this function for anything?
     def sql2pandas(self, sql_name):
         db = sqlite3.connect(sql_name)
@@ -184,3 +184,4 @@ class SQLBuilder:
                                         for i, col_name in enumerate(cols)]) for q in qs]
         db.close()
         return dfs
+    """

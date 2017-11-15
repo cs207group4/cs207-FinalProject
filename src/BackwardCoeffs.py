@@ -6,6 +6,8 @@ reversible, elementary reactions.
 '''
 
 import numpy as np
+from InputParser import InputParser
+from SQLParser import SQLParser
 
 class BackwardCoeffs:
     '''Methods for calculating the backward reaction rate coefficients.
@@ -17,6 +19,13 @@ class BackwardCoeffs:
               the NASA polynomials.
     backward_coeffs:  Return the backward reaction rate
                       coefficient for each reaction.
+
+    EXAMPLE
+    =======
+    >>> ip = InputParser('tests/test_xml/rxns_reversible.xml')
+    Finished reading xml input file
+    >>> sql = SQLParser('src/data/thermo30.sqlite')
+    >>> bc = BackwardCoeffs(ip.nu_react, ip.nu_prod, ip.species, sql)
     '''
 
     def __init__(self, nu_react, nu_prod, species, sql):

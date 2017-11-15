@@ -54,19 +54,6 @@ class SQLParser:
         db.close()
         self.data = data
 
-    #do we need this function?
-    def sql2pandas(self, sql_name):
-        db = sqlite3.connect(sql_name)
-        cursor = db.cursor()
-        cols = ['SPECIES_NAME', 'TLOW', 'THIGH', 'COEFF_1', 'COEFF_2', 'COEFF_3', \
-                'COEFF_4', 'COEFF_5', 'COEFF_6', 'COEFF_7']
-        queries = ['''SELECT * FROM LOW''', '''SELECT * FROM HIGH''']
-        qs = [cursor.execute(query).fetchall() for query in queries]
-        dfs = [pd.DataFrame.from_items([(col_name, [col[i] for col in q]) \
-                                        for i, col_name in enumerate(cols)]) for q in qs]
-        db.close()
-        return dfs
-
 
     def _get_coeffs(self, specie, T):
         '''Helper function to return NASA polynomial coefficients of a specie at temperature T
@@ -128,3 +115,18 @@ class SQLParser:
             or ('high' in data and data['high']['Ts'][0] < T and T <= data['high']['Ts'][1]):
                 species_list.append(species)
         return species_list
+    
+    """
+    #do we need this function?
+    def sql2pandas(self, sql_name):
+        db = sqlite3.connect(sql_name)
+        cursor = db.cursor()
+        cols = ['SPECIES_NAME', 'TLOW', 'THIGH', 'COEFF_1', 'COEFF_2', 'COEFF_3', \
+                'COEFF_4', 'COEFF_5', 'COEFF_6', 'COEFF_7']
+        queries = ['''SELECT * FROM LOW''', '''SELECT * FROM HIGH''']
+        qs = [cursor.execute(query).fetchall() for query in queries]
+        dfs = [pd.DataFrame.from_items([(col_name, [col[i] for col in q]) \
+                                        for i, col_name in enumerate(cols)]) for q in qs]
+        db.close()
+        return dfs
+    """

@@ -189,12 +189,13 @@ class chemkin:
             raise ValueError("ERROR: All the species concentrations must be non-negative")
 
         #initialize progress rate vector
-        pr = np.array([rc.k_forward() for rc in self.rc_list])* np.product(x ** self.nu_react, axis=0)
+        kf = np.array([rc.k_forward() for rc in self.rc_list])
+        pr = kf* np.product(x ** self.nu_react, axis=0)
 
         if np.any(self.reversible):
             if self.T is None:
                 raise ValueError('Temperature not set.')
-            pr[self.reversible] = pr[self.reversible] - self.bc.backward_coeffs(pr[self.reversible], self.T) \
+            pr[self.reversible] = pr[self.reversible] - self.bc.backward_coeffs(kf[self.reversible], self.T) \
             * np.product(x ** self.nu_prod[:, self.reversible], axis=0)
         return pr
 
