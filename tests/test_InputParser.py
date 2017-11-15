@@ -1,11 +1,7 @@
 import sys
 import numpy as np
 
-sys.path.append('../src/')
-
-
-
-from InputParser import InputParser
+from pychemkin import *
 
 
 def test_correct():

@@ -1,7 +1,4 @@
-import sys
-sys.path.append('../src/')
-
-from ReactionCoeffs import ReactionCoeffs
+from pychemkin import *
 
 
 def test_str():

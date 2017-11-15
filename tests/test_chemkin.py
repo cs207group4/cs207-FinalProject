@@ -1,8 +1,5 @@
 #change this once we rearrange directory structure
-
-import sys
-sys.path.append('../src/')
-from chemkin import *
+from pychemkin import *
 
 def test_not_implement():
     """Test that input parser correctly handles reaction types and rate coefficients that are not implemented"""
@@ -69,7 +66,7 @@ def test_repr():
     test override of __repr__ function
     """
     reactions = test_from_xml()
-    assert repr(reactions)=="chemkin('tests/test_xml/rxns.xml', sql_name = 'src/data/thermo30.sqlite')"
+    assert repr(reactions)=="chemkin('tests/test_xml/rxns.xml', sql_name = 'pychemkin/data/thermo30.sqlite')"
 
 
 def test_dimension_error():
