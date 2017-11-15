@@ -3,7 +3,7 @@
 <ctml>
 
     <phase>
-        <speciesArray> H O OH H2 H2O O2 </speciesArray>
+        <speciesArray> H O OH H2 H2O </speciesArray>
     </phase>
 
     <reactionData id="test_mechanism">

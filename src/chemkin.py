@@ -1,30 +1,32 @@
+import xml.etree.ElementTree as ETs
 import numpy as np
+from collections import OrderedDict
+from SQLParser import SQLParser
+from InputParser import InputParser
+from ReactionCoeffs import ReactionCoeffs
+from BackwardCoeffs import BackwardCoeffs
+
 
 class chemkin:
 
     '''
     This class Chemkin computes the the reaction rates/ progress rates of the species
     at each temperature of interest given species concentrations
-
-
     INPUTS
     =======
-    Initialize with matrix of reactant, matrix of product and reaction_coeffs
     Using an XML file, the class calls InputParser and ReactionCoeffs to calculate the reaction rates
-
     RETURNS
     ========
     After initialization, user could call:
      - set_rc_params(T=..., R=..., A=...): method to set params of reaction coeffs
-     - reaction_rate(x): method to calculate reaction rate given concentration x (assumes temperature is 
+     - reaction_rate(x): method to calculate reaction rate given concentration x (assumes temperature is
        already set)
      - reaction_rate_T(x,T): method to calculate reaction rate given concentration x and temperature T.
      - species: A sequence (list, array, tuple) containing sthe names of the species
      - progress_rate(x): calculate progress rate given x (assumes temperature is already set)
-
     EXAMPLES
     =========
-    >>> chem = chemkin.from_xml("rxns.xml")
+    >>> chem = chemkin("tests/test_xml/rxns.xml", sql_name = "src/data/thermo30.sqlite")
     Finished reading xml input file
     >>> print(chem.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
@@ -33,62 +35,73 @@ class chemkin:
             -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     '''
 
-    def __init__(self, nu_react, nu_prod, reaction_coeffs, backward_coeffs, rxn_types, \
-                 reversible, species, equations=None):
-        """
+    def __init__(self, file_name, sql_name='src/data/thermo30.sqlite'):
+        '''
         INPUT
         =====
-        nu_prod: Array of integers, required
-                 N X M array of stoichiometric coefficients for products (N species, M reactions)
-        nu_react: Array of integers, required
-                 N x M array of stoichiometric coefficients for reactants
-        reaction_coeffs: Array, required
-                 Length M list of reaction rate coefficients in the form of representations of ReactionCoeff 
-                 objects
-        backward_coeffs: Instance of BackwardCoeffs, required
-        rxn_types: Array of strings, required
-                 List or array of length M of reaction types
-        reversible: Boolean array, required
-                 List or array of length M denoting whether the reaction is reversible
-        species: Array of strings, required
-                 List or array of length N providing the species
-        equations: Array of strings, optional
-                 List or array of length M providing the reaction equations
-        """
-        self.nu_react = np.array(nu_react)
-        self.nu_prod = np.array(nu_prod)
-        if self.nu_prod.shape != self.nu_react.shape or len(reaction_coeffs) != self.nu_prod.shape[1]:
+        file_name: string, required
+                   xml file containing species and chemical reaction information
+        sql_name: string, optional
+                Name of sqlite database holding the NASA thermodynamic data
+        '''
+        self.file_name = file_name
+        self.sql_name = sql_name
+
+        sql = SQLParser(sql_name)
+        input_ = InputParser(file_name)
+        self.rxndata = input_.reactions
+        rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
+        equationlist = []
+        rxn_types = []
+        reversible = []
+
+        for i, reaction in enumerate(self.rxndata):
+            equationlist.append(reaction['equation'])
+            rxn_types.append(reaction['type'])
+            reversible.append(reaction['reversible'].strip().lower())
+        reversible = np.array(reversible) == 'yes'
+
+        backward_coeffs = BackwardCoeffs(input_.nu_react[:, reversible], input_.nu_prod[:, reversible], input_.species, sql)
+
+        self.nu_react = input_.nu_react
+        self.nu_prod = input_.nu_prod
+
+        if self.nu_prod.shape != self.nu_react.shape or len(rc_list) != self.nu_prod.shape[1]:
             raise ValueError("Dimensions not consistent!")
         if np.any(self.nu_react<0.0) or np.any(self.nu_prod<0.0):
             raise ValueError("Negative stoichiometric coefficients are prohibited!")
-        self.rc_list = reaction_coeffs
+
+        self.rc_list = rc_list
         self.bc = backward_coeffs
-        self.species = species
-        self.equations = equations
+        self.species = input_.species
+        self.equations = equationlist
         self.rxn_types = rxn_types
+
         if not np.array_equal(reversible, reversible.astype(bool)):
             raise TypeError('`reversible` should be a boolean array.')
         self.reversible = reversible
         if np.any(np.array(self.rxn_types)!='Elementary'):
             raise NotImplementedError('Only elementary reactions accepted')
         self.T = None
-
+    """
     @classmethod
-    def from_xml(cls, file_name, sql_name='thermo30.sqlite'):
-        """
+    def from_xml(cls, file_name, sql_name='src/data/thermo30.sqlite'):
+        '''
         Alternate constructor starting with an xml input file
-
         INPUT
         =====
         file_name: string, required
                 Name of input xml file
         sql_name: string, optional
-                Name of input sqlite file
-                 
+                Name of sqlite database holding the NASA thermodynamic data
+
         RETURNS
         =======
         initialized chemkin object
-        """
+        '''
+        self.file_name = file_name
+        self.sql_name = sql_name
+
         sql = SQLParser(sql_name)
         input_ = InputParser(file_name)
         rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
@@ -96,21 +109,22 @@ class chemkin:
         equationlist = []
         rxn_types = []
         reversible = []
-        
+
         for i, reaction in enumerate(rxndata):
             equationlist.append(reaction['equation'])
             rxn_types.append(reaction['type'])
             reversible.append(reaction['reversible'].strip().lower())
         reversible = np.array(reversible) == 'yes'
-        
+
         bc = BackwardCoeffs(input_.nu_react[:, reversible], input_.nu_prod[:, reversible], input_.species, sql)
-        
+
         return cls(input_.nu_react, input_.nu_prod, rc_list, bc, rxn_types, reversible, species=input_.species, \
                    equations=equationlist)
 
     @classmethod
+    #do we use this function for anything?
     def init_const_rc(cls, nu_react, nu_prod, rcs, rxn_types, reversible, species, equations=None, \
-                     sql_name='thermo30.sqlite'):
+                     sql_name='src/data/thermo30.sqlite'):
         ''' construct an object with all constant or precalculated coeffs.
         '''
         sql= SQLParser(sql_name)
@@ -118,7 +132,7 @@ class chemkin:
         reversible = reversible.astype(bool)
         bc = BackwardCoeffs(np.array(nu_react)[:, reversible], np.array(nu_prod)[:, reversible], species, sql)
         return cls(nu_react, nu_prod, rc_list, bc, rxn_types, reversible, species, equations)
-
+    """
     def set_rc_params(self,**kwargs):
         ''' add new or change old parameters for all reaction coeffs.
         '''
@@ -129,9 +143,7 @@ class chemkin:
 
     def __repr__(self):
         class_name = type(self).__name__
-        args = repr(self.nu_react.tolist()) + ',' + repr(self.nu_prod.tolist()) + ',' + repr(self.rc_list) \
-        + ',' + repr(self.bc) + ',' + repr(self.rxn_types)+ ',' + repr(self.reversible)+',' + repr(self.species)\
-        + ',' + repr(self.equations)
+        args = "'{}', sql_name = '{}'".format(self.file_name, self.sql_name)
         return class_name + "(" + args +")"
 
     def __len__(self):
@@ -156,19 +168,16 @@ class chemkin:
         return "\n".join([eqn_str, species_str,nu_react_str,nu_prod_str,rc_str, rxn_str, reversible_str])
 
     def progress_rate(self, x):
-        '''
-        Return progress rate for a system of M reactions involving N species
-
+        '''Return progress rate for a system of M reactions involving N species
 
         INPUTS
         =======
         x: array or list, required
-           A length-N vector specifying concentration of each specie
+           A length-N vector specifying concentrations of the N species
 
         RETURNS
         ========
-        R: Array of reaction rates of species (length N)
-
+        Length-N array of reaction rates of species
         '''
 
         x = np.array(x).reshape(-1,1)
@@ -179,11 +188,12 @@ class chemkin:
         if np.any(x<0):
             raise ValueError("ERROR: All the species concentrations must be non-negative")
 
-        pr = np.array([rc.kval() for rc in self.rc_list]).astype(float) * np.product(x ** self.nu_react, axis=0)
-        
-        if np.sum(self.reversible) > 0:
+        #initialize progress rate vector
+        pr = np.array([rc.k_forward() for rc in self.rc_list])* np.product(x ** self.nu_react, axis=0)
+
+        if np.any(self.reversible):
             if self.T is None:
-                raise ValueError('T not set.')
+                raise ValueError('Temperature not set.')
             pr[self.reversible] = pr[self.reversible] - self.bc.backward_coeffs(pr[self.reversible], self.T) \
             * np.product(x ** self.nu_prod[:, self.reversible], axis=0)
         return pr
@@ -191,16 +201,13 @@ class chemkin:
     def reaction_rate(self,x):
         '''
         Return reaction rates for a system of M reactions involving N species
-
         INPUTS
         =======
         x: array or list, required
            A length-N vector specifying concentration of each specie
-
         RETURNS
         ========
         R: Array of reaction rates of species (length N)
-
         '''
 
         r = self.progress_rate(x)
@@ -209,20 +216,17 @@ class chemkin:
         return np.sum(r * (self.nu_prod-self.nu_react), axis=1)
 
     def reaction_rate_T(self, x, T):
-        """
+        '''
         A wrapper function to calculate reaction rate based on user-defined x and T
-
         INPUT
         ====
         x: Array or list, required
            Vector of concentration of each species of length N, where N is the number of species
         T: float, required
            Temperature, in Kelvin
-
         RETURNS
         ======
         Array of length N containing reaction rates for each species
-
-        """
+        '''
         self.set_rc_params(T=T)
         return self.reaction_rate(x)

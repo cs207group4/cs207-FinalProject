@@ -1,33 +1,25 @@
 import xml.etree.ElementTree as ET
-import numpy as np
 from copy import deepcopy
-from collections import OrderedDict
+import numpy as np
+
 
 class InputParser:
 
     """
-    This class Input Parser takes the input of a xml file
-    and creates useful variables can be called by other functions or users
+    The Input Parser class processes xml input used for subsequent chemical kinetics calculations
 
-
-    INPUTS
-    =======
-    file_name: the xml filename.
-
-    RETURNS
+    Attributes
     ========
-    ###### After init, following class variables can be used:
     'equation' - an equation of the chemical reaction to solve
     'id'- the number of reactions in the file
     'products'- the output of the chemical equation
-    'rateCoeffParams'- the variables needed to calculate k, or k
-    'reactants' - the input of the chemical equation
-    'reversible'- yes/no if a reversable equation
+    'rateCoeffParams'- the variables needed to calculate the reaction rate coefficient
+    'reactants' - chemical reactants
+    'reversible'- yes/no if a reversible reaction
     'type'- the type of reaction (i.e. 'elementary')
-
     EXAMPLES
     =========
-    >>> input_ = InputParser('rxns.xml')
+    >>> input_ = InputParser('tests/test_xml/rxns.xml')
     Finished reading xml input file
     >>> print(input_.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
@@ -40,7 +32,6 @@ class InputParser:
         =====
         file_name: string, required
                    name of xml input file
-
         """
         self.file_name = file_name
         self.raw = ET.parse(self.file_name).getroot()

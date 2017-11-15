@@ -2,20 +2,19 @@ import numpy as np
 
 class ReactionCoeffs:
     """
-    A class for computating reaction coefficients
+    A class for computing reaction coefficients
 
-    Initialize by calling reaction_coeffs(type, {params})
-    Set params by calling set_params({params})
-    Calculate k value by calling kval()
+    set_params: sets reaction rate coefficient parameters
+    k_forward: compute forward reaction rate coefficient
 
     EXAMPLES
     =========
     >>> rc = ReactionCoeffs('Constant', k = 1e3)
-    >>> rc.kval()
+    >>> rc.k_forward()
     1000.0
     >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
     >>> rc.set_params(T=1e2)
-    >>> rc.kval()
+    >>> rc.k_forward()
     3003549.0889639617
     """
 
@@ -47,19 +46,17 @@ class ReactionCoeffs:
 
     def __eq__(self,other):
         """
-        Check if two reaction rate coefficients are the same. They are same if the k values are equal.
+        Check if two forward reaction rate coefficients are the same. They are same if the k values are equal.
         """
-        return self.kval() == other.kval()
+        return self.k_forward() == other.k_forward()
 
     def __check_param_in(self, param_list):
         """
         Returns dictionary of parameter values
-
         INPUT
         =====
         param_list: iterable, required
                     list of parameter namesof interest
-
         RETURNS
         =======
         Dictionary of parameters in provided list (returns None if mismatch present between parameter list and instance attributes)
@@ -72,18 +69,17 @@ class ReactionCoeffs:
                 return None
         return param_dict
 
-    def kval(self):
+    def k_forward(self):
         """
-        Computes reaction coefficient
+        Computes forward reaction rate coefficient
 
         NOTES
         ==========
         call corresponding private method to calculate k_values.
-        Easy to extend... Just write a new private method for new type of coeffs.
 
         RETURNS
         ==========
-        k: (real number) Reaction coefficient
+        k: (real number) Forward reaction rate coefficient
         """
         if self.__rtype == "Constant":
             params = self.__check_param_in(['k'])
@@ -109,17 +105,14 @@ class ReactionCoeffs:
     def __const(self,k):
         """
         Return constant coefficient
-
         INPUTS
         =======
         k: float, required
            constant reaction rate coefficient
-
         RETURNS
         ========
         k: float
            constant reaction rate coefficient
-
         """
 
         if k < 0:
@@ -129,7 +122,6 @@ class ReactionCoeffs:
     def __arr(self,A,E,T,R):
         """
         Return Arrhenius reaction rate coefficient
-
         INPUTS
         =======
         A: float, required
@@ -140,18 +132,14 @@ class ReactionCoeffs:
            Temperature. T must be positive (assuming a Kelvin scale)
         R: float, required
            Ideal gas constant
-
-
         RETURNS
         ========
         k: float
            Arrhenius reaction rate coefficient
-
         NOTES
         ========
         R = 8.314 is the default ideal gas constant.
         It should be positive (except to convert units)
-
         """
 
         if A < 0.0:
@@ -168,7 +156,6 @@ class ReactionCoeffs:
     def __mod_arr(self,A,b,E,T,R):
         """
         Return modified Arrhenius reaction rate coefficient
-
         INPUTS
         =======
         A: float, required
@@ -181,12 +168,9 @@ class ReactionCoeffs:
            Temperature. T must be positive (assuming a Kelvin scale)
         R: float, required
            The ideal gas constant
-
-
         RETURNS
         ========
         k: Modified Arrhenius reaction rate coefficient
-
         NOTES
         ========
         R=8.314 is the default ideal gas constant
