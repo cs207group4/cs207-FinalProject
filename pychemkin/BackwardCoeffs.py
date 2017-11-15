@@ -6,8 +6,8 @@ reversible, elementary reactions.
 '''
 
 import numpy as np
-from InputParser import InputParser
-from SQLParser import SQLParser
+from .InputParser import InputParser
+from .SQLParser import SQLParser
 
 class BackwardCoeffs:
     '''Methods for calculating the backward reaction rate coefficients.

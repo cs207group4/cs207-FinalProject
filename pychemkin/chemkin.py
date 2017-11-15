@@ -1,10 +1,10 @@
 import xml.etree.ElementTree as ETs
 import numpy as np
 from collections import OrderedDict
-from SQLParser import SQLParser
-from InputParser import InputParser
-from ReactionCoeffs import ReactionCoeffs
-from BackwardCoeffs import BackwardCoeffs
+from .SQLParser import SQLParser
+from .InputParser import InputParser
+from .ReactionCoeffs import ReactionCoeffs
+from .BackwardCoeffs import BackwardCoeffs
 
 
 class chemkin:
