@@ -77,62 +77,11 @@ class chemkin:
         self.equations = equationlist
         self.rxn_types = rxn_types
 
-        if not np.array_equal(reversible, reversible.astype(bool)):
-            raise TypeError('`reversible` should be a boolean array.')
         self.reversible = reversible
         if np.any(np.array(self.rxn_types)!='Elementary'):
             raise NotImplementedError('Only elementary reactions accepted')
         self.T = None
-    """
-    @classmethod
-    def from_xml(cls, file_name, sql_name='src/data/thermo30.sqlite'):
-        '''
-        Alternate constructor starting with an xml input file
-        INPUT
-        =====
-        file_name: string, required
-                Name of input xml file
-        sql_name: string, optional
-                Name of sqlite database holding the NASA thermodynamic data
 
-        RETURNS
-        =======
-        initialized chemkin object
-        '''
-        self.file_name = file_name
-        self.sql_name = sql_name
-
-        sql = SQLParser(sql_name)
-        input_ = InputParser(file_name)
-        rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
-        rxndata = input_.reactions
-        equationlist = []
-        rxn_types = []
-        reversible = []
-
-        for i, reaction in enumerate(rxndata):
-            equationlist.append(reaction['equation'])
-            rxn_types.append(reaction['type'])
-            reversible.append(reaction['reversible'].strip().lower())
-        reversible = np.array(reversible) == 'yes'
-
-        bc = BackwardCoeffs(input_.nu_react[:, reversible], input_.nu_prod[:, reversible], input_.species, sql)
-
-        return cls(input_.nu_react, input_.nu_prod, rc_list, bc, rxn_types, reversible, species=input_.species, \
-                   equations=equationlist)
-
-    @classmethod
-    #do we use this function for anything?
-    def init_const_rc(cls, nu_react, nu_prod, rcs, rxn_types, reversible, species, equations=None, \
-                     sql_name='src/data/thermo30.sqlite'):
-        ''' construct an object with all constant or precalculated coeffs.
-        '''
-        sql= SQLParser(sql_name)
-        rc_list = [ReactionCoeffs(type="Constant", k=rc_) for rc_ in rcs]
-        reversible = reversible.astype(bool)
-        bc = BackwardCoeffs(np.array(nu_react)[:, reversible], np.array(nu_prod)[:, reversible], species, sql)
-        return cls(nu_react, nu_prod, rc_list, bc, rxn_types, reversible, species, equations)
-    """
     def set_rc_params(self,**kwargs):
         ''' add new or change old parameters for all reaction coeffs.
         '''
