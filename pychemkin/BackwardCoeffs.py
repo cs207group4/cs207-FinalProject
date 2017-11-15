@@ -1,16 +1,9 @@
-
-'''Thermodynamics and Thermochemistry for Chemical Kinetics
-This module contains a BackwardCoeffs class with methods for
-computing the backward reaction rates for a set of
-reversible, elementary reactions.
-'''
-
 import numpy as np
 from .InputParser import InputParser
 from .SQLParser import SQLParser
 
 class BackwardCoeffs:
-    '''Methods for calculating the backward reaction rate coefficients.
+    '''Methods for calculating the backward reaction rate coefficients for a set of reversible, elementary reactions.
     Cp_over_R: Return specific heat of each specie given by
                the NASA polynomials.
     H_over_RT:  Return the enthalpy of each specie given by
