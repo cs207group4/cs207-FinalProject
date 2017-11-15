@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<ctml>
+
+  <phase>
+      <speciesArray> H O2 O OH </speciesArray>
+  </phase>
+
+  <reactionData id="hydrogen_air_mechanism">
+    <!-- reaction 01  -->
+    <reaction reversible="yes" type="Elementary" id="reaction01">
+      <equation>H + O2 [=] O + OH</equation>
+      <rateCoeff>
+        <modifiedArrhenius>
+          <A>3.547e+15</A>
+          <b>-0.406</b>
+          <E>1.6599e+04</E>
+        </modifiedArrhenius>
+      </rateCoeff>
+      <reactants>H:1 O2:1</reactants>
+      <products>O:1 OH:1</products>
+    </reaction>
+
+  </reactionData>
+</ctml>
