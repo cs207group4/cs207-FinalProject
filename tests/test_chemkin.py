@@ -69,6 +69,15 @@ def test_repr():
     assert repr(reactions).find("chemkin('tests/test_xml/rxns.xml', sql_name ") >= 0
     print(repr(reactions))
 
+def test_str():
+    """
+    test __str__ function
+    """
+    expect = "chemical equations:\n[\nH + O2 =] OH + O\nH2 + O =] OH + H\nH2 + OH =] H2O + H\n]\nspecies: ['H', 'O', 'OH', 'H2', 'H2O', 'O2']\nnu_react:\n[[1 0 0]\n [0 1 0]\n [0 0 1]\n [0 1 1]\n [0 0 0]\n [1 0 0]]\nnu_prod:\n[[0 1 1]\n [1 0 0]\n [1 1 0]\n [0 0 0]\n [0 0 1]\n [0 0 0]]\nreaction coefficients:\n[\nArrhenius Reaction Coeffs: {'A': 35200000000.0, 'E': 71400.0, 'R': 8.314, 'T': 1000}\nmodifiedArrhenius Reaction Coeffs: {'A': 0.0506, 'b': 2.7, 'E': 26300.0, 'R': 8.314, 'T': 1000}\nConstant Reaction Coeffs: {'k': 1000.0, 'R': 8.314, 'T': 1000}\n]\nreaction types: ['Elementary', 'Elementary', 'Elementary']\nreversible: [False False False]"
+    reactions = test_from_xml()
+    assert(str(reactions) == expect)
+    print(str(reactions))
+    
 def test_dimension_error():
     """
     check that inconsistencies in input params are handled correctly
