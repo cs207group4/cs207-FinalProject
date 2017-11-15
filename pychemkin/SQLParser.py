@@ -13,7 +13,7 @@ class SQLParser:
 
     EXAMPLES
     =========
-    >>> parser = SQLParser('src/data/thermo30.sqlite')
+    >>> parser = SQLParser('pychemkin/data/thermo30.sqlite')
     >>> parser.get_multi_coeffs(['O','O2'], 700)
     array([[  3.16826710e+00,  -3.27931884e-03,   6.64306396e-06,
              -6.12806624e-09,   2.11265971e-12,   2.91222592e+04,
@@ -115,7 +115,7 @@ class SQLParser:
             or ('high' in data and data['high']['Ts'][0] < T and T <= data['high']['Ts'][1]):
                 species_list.append(species)
         return species_list
-    
+
     """
     #do we need this function?
     def sql2pandas(self, sql_name):

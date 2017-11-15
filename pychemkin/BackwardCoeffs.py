@@ -24,7 +24,7 @@ class BackwardCoeffs:
     =======
     >>> ip = InputParser('tests/test_xml/rxns_reversible.xml')
     Finished reading xml input file
-    >>> sql = SQLParser('src/data/thermo30.sqlite')
+    >>> sql = SQLParser('pychemkin/data/thermo30.sqlite')
     >>> bc = BackwardCoeffs(ip.nu_react, ip.nu_prod, ip.species, sql)
     '''
 
