@@ -114,3 +114,4 @@ def test_reversible():
     rxns = chemkin('tests/test_xml/rxns_reversible.xml')
     x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
     T = 1500
+    print(rxns.reaction_rate(x,T))
