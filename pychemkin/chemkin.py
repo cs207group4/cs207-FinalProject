@@ -145,8 +145,6 @@ class chemkin:
         pr = kf* np.product(x ** self.nu_react, axis=0)
 
         if np.any(self.reversible):
-            if self.T is None:
-                raise ValueError('Temperature not set.')
             pr[self.reversible] = pr[self.reversible] - self.bc.backward_coeffs(kf[self.reversible], self.T) \
             * np.product(x ** self.nu_prod[:, self.reversible], axis=0)
         return pr
