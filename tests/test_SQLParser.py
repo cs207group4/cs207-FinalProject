@@ -31,3 +31,18 @@ def test_outofTrange():
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
+        
+def test_get_species():
+    '''
+    Test get_species function
+    '''
+    parser = SQLParser('pychemkin/data/thermo.sqlite')
+    print(parser.get_species(1000))
+
+    
+def test_sql2pandas():
+    '''
+    Test sql2pandas function
+    '''
+    parser = SQLParser('pychemkin/data/thermo.sqlite')
+    print(parser.sql2pandas('pychemkin/data/thermo.sqlite'))

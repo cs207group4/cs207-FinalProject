@@ -116,8 +116,7 @@ class SQLParser:
                 species_list.append(species)
         return species_list
 
-    """
-    #do we need this function?
+
     def sql2pandas(self, sql_name):
         db = sqlite3.connect(sql_name)
         cursor = db.cursor()
@@ -129,4 +128,3 @@ class SQLParser:
                                         for i, col_name in enumerate(cols)]) for q in qs]
         db.close()
         return dfs
-    """
