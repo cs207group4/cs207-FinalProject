@@ -18,19 +18,17 @@ class chemkin:
     RETURNS
     ========
     After initialization, user could call:
-     - set_rc_params(T=..., R=..., A=...): method to set params of reaction coeffs
-     - reaction_rate(x): method to calculate reaction rate given concentration x (assumes temperature is
-       already set)
-     - reaction_rate_T(x,T): method to calculate reaction rate given concentration x and temperature T.
+     - reaction_rate(x, T): method to calculate reaction rate given concentration x and temperature T.
      - species: A sequence (list, array, tuple) containing sthe names of the species
      - progress_rate(x): calculate progress rate given x (assumes temperature is already set)
+     - _set_rc_params(T=..., R=..., A=...): internal method to set params of reaction coeffs
     EXAMPLES
     =========
     >>> chem = chemkin("tests/test_xml/rxns.xml", sql_name = "src/data/thermo30.sqlite")
     Finished reading xml input file
     >>> print(chem.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
-    >>> chem.reaction_rate_T([1,1,1,1,1,1],1000)
+    >>> chem.reaction_rate([1,1,1,1,1,1], 1000)
     array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
             -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     '''
@@ -82,7 +80,7 @@ class chemkin:
             raise NotImplementedError('Only elementary reactions accepted')
         self.T = None
 
-    def set_rc_params(self,**kwargs):
+    def _set_rc_params(self,**kwargs):
         ''' add new or change old parameters for all reaction coeffs.
         '''
         if 'T' in kwargs:
@@ -116,19 +114,20 @@ class chemkin:
         reversible_str = "reversible: " + str(self.reversible)
         return "\n".join([eqn_str, species_str,nu_react_str,nu_prod_str,rc_str, rxn_str, reversible_str])
 
-    def progress_rate(self, x):
+    def progress_rate(self, x, T):
         '''Return progress rate for a system of M reactions involving N species
 
         INPUTS
         =======
         x: array or list, required
            A length-N vector specifying concentrations of the N species
-
+        T: float, optional
+           Temperature in K
         RETURNS
         ========
         Length-N array of reaction rates of species
         '''
-
+        self._set_rc_params(T=T)
         x = np.array(x).reshape(-1,1)
         if len(x) != self.nu_prod.shape[0]:
             raise ValueError("ERROR: The concentration vector x must be of length N, where N is the \
@@ -148,35 +147,21 @@ class chemkin:
             * np.product(x ** self.nu_prod[:, self.reversible], axis=0)
         return pr
 
-    def reaction_rate(self,x):
+    def reaction_rate(self, x, T):
         '''
         Return reaction rates for a system of M reactions involving N species
         INPUTS
         =======
         x: array or list, required
            A length-N vector specifying concentration of each specie
+        T: float, optional
+           Temperature in K
         RETURNS
         ========
         R: Array of reaction rates of species (length N)
         '''
-
-        r = self.progress_rate(x)
+        self._set_rc_params(T=T)
+        r = self.progress_rate(x, T)
 
         # Return an array...
         return np.sum(r * (self.nu_prod-self.nu_react), axis=1)
-
-    def reaction_rate_T(self, x, T):
-        '''
-        A wrapper function to calculate reaction rate based on user-defined x and T
-        INPUT
-        ====
-        x: Array or list, required
-           Vector of concentration of each species of length N, where N is the number of species
-        T: float, required
-           Temperature, in Kelvin
-        RETURNS
-        ======
-        Array of length N containing reaction rates for each species
-        '''
-        self.set_rc_params(T=T)
-        return self.reaction_rate(x)

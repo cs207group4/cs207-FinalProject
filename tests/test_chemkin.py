@@ -25,77 +25,33 @@ def test_from_xml():
     testing normal reaction rate calculations from xml input
     """
     reactions = chemkin('tests/test_xml/rxns.xml')
-    reactions.set_rc_params(T=1000)
+    reactions._set_rc_params(T=1000)
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
         -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
-    assert all(reactions.reaction_rate([1, 1, 1, 1, 1, 1]).astype(int) == expect.astype(int))
+    assert all(reactions.reaction_rate([1, 1, 1, 1, 1, 1], 1000).astype(int) == expect.astype(int))
     return reactions
 
 
-def test_from_singlerxnxml():
+def test_singlerxnxml():
 
     """testing that single reaction systems are handled correctly"""
 
     reactions = chemkin('tests/test_xml/rxns_single.xml')
-    reactions.set_rc_params(T=1000)
+    reactions._set_rc_params(T=1000)
     expect = np.array([ -1.e4, -1.e4, 1.e4, 1.e4])
-    assert all(reactions.reaction_rate([1,1,1,1]).astype(int) == expect.astype(int))
+    assert all(reactions.reaction_rate([1,1,1,1],1000).astype(int) == expect.astype(int))
     return reactions
 
 
-def test_reaction_rate_with_T():
+def test_reaction_rate():
     """
     test wrapper function for specifying temp and concentration in the same function
     """
     reactions = test_from_xml()
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
         -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
-    assert all(reactions.reaction_rate_T([1, 1, 1, 1, 1, 1],1000).astype(int) == expect.astype(int))
-'''
-def test_construct():
-    """
-    test direct input of reaction system params into instantiation of chemkin object
-    """
-    rc_list = [
-        ReactionCoeffs(type = "modifiedArrhenius", A=1e8, b=0.5, E=5e4),
-        ReactionCoeffs(type = "Constant", k=1e4),
-        ReactionCoeffs(type = "Arrhenius", A=1e7, E=1e4),
-    ]
-    v1 = np.array([
-        [2,0,0],
-        [1,0,1],
-        [0,1,0],
-        [0,1,0],
-        [0,0,1]
-    ])
-    v2 = np.array([
-        [1,0,0],
-        [0,1,0],
-        [2,0,1],
-        [0,0,1],
-        [0,1,0]
-    ])
-    x = np.array([
-        2,1,0.5,1,1
-    ]).reshape(-1,1)
-    expect = dict()
-    expect[750] = np.array([-3607077.87280407, -5613545.1836208,  9220623.05642486,
-        2006467.31081673, -2006467.31081673])
-    expect[1500] = np.array([ -2.81117621e+08,  -2.85597559e+08,   5.66715180e+08,
-         4.47993847e+06,  -4.47993847e+06])
-    expect[2500] = np.array([ -1.80426143e+09,  -1.81043736e+09,   3.61469878e+09,
-         6.17593098e+06,  -6.17593098e+06])
-    rxn_types = ['Elementary']*3
-    reversible = np.zeros(3).astype(bool)
-    species = ['O','OH','H','H2O','O2']
-    reactions = chemkin(v1,v2,rc_list,None,rxn_types, reversible, species)
+    assert all(reactions.reaction_rate([1, 1, 1, 1, 1, 1],1000).astype(int) == expect.astype(int))
 
-    for t in [750,1500,2500]:
-        reactions.set_rc_params(T=t)
-        assert str(reactions.reaction_rate(x)) == str(expect[t])
-    reactions = chemkin.init_const_rc(v1,v2,[1,1,1],['Elementary']*5, reversible, species)
-    print(reactions)
-'''
 def test_construct_nonelementary():
     """
     test that chemkin object handles non-elementary reactions as expected
@@ -132,22 +88,17 @@ def test_bad_x():
     """
     reactions = test_from_xml()
     try:
-        reactions.progress_rate([[1],[1]])
+        reactions.progress_rate([[1],[1]], 1000)
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
     try:
-        reactions.reaction_rate([[1],[1]])
+        reactions.reaction_rate([[1],[1]], 10000)
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
     try:
-        reactions.reaction_rate([[1],[-1],[1],[1],[1],[1]])
-    except ValueError as e:
-        assert type(e) == ValueError
-        print(e)
-    try:
-        reactions.reaction_rate_T([[1],[-1],[1],[1],[1],[1]],-1)
+        reactions.reaction_rate([[1],[-1],[1],[1],[1],[1]], 1000)
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
@@ -156,11 +107,11 @@ def test_long():
     rxns = chemkin('tests/test_xml/rxnset_long.xml')
     x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
     T = 1500
-    print(rxns.reaction_rate_T(x, T))
+    print(rxns.reaction_rate(x, T))
     expect = np.array([ -7.10942556e+12,  -1.58164670e+13,   2.20952666e+13,
         -1.65522031e+12,   1.12504921e+13,   0.00000000e+00,
          1.66470929e+13,  -2.54117388e+13])
-    assert str(rxns.reaction_rate_T(x, T)) == str(expect)
+    assert str(rxns.reaction_rate(x, T)) == str(expect)
 
 def test_reversible():
     rxns = chemkin('tests/test_xml/rxns_reversible.xml')
