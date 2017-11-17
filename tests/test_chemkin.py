@@ -125,7 +125,7 @@ def test_long():
     expect = np.array([ -7.10942556e+12,  -1.58164670e+13,   2.20952666e+13,
         -1.65522031e+12,   1.12504921e+13,   0.00000000e+00,
          1.66470929e+13,  -2.54117388e+13])
-    assert all(reactions.reaction_rate(x, T).astype(int) == expect.astype(int))
+    assert str(reactions.reaction_rate(x, T)) == str(expect)
 
 def test_reversible():
     reactions = chemkin('tests/test_xml/rxns_reversible.xml')
