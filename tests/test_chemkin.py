@@ -134,3 +134,10 @@ def test_reversible():
     expect = np.array([  3.77689350e+14,  -3.81148508e+14,  -4.18872924e+14,   6.96275658e+12,
    3.07172197e+13,   3.93416746e+14,   1.66470991e+13,  -2.54117388e+13])
     assert all(reactions.reaction_rate(x, T).astype(int) == expect.astype(int))
+
+def test_singlereversible():
+    reactions = chemkin('tests/test_xml/rxns_singlereversible.xml')
+    x = np.array([2., 1., 0.5, 1.])
+    T = 1500
+    expect = np.array([  2.97178272e+14,   2.97178272e+14,  -2.97178272e+14,  -2.97178272e+14])
+    assert all(reactions.reaction_rate(x, T).astype(int) == expect.astype(int))
