@@ -92,6 +92,9 @@ def test_str():
     """
     reactions = test_from_xml()
     print(str(reactions))
+    reactions.equations = None
+    reactions.species = None
+    print(str(reactions))
     
 def test_dimension_error():
     """
