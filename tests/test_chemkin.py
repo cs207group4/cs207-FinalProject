@@ -118,17 +118,19 @@ def test_bad_x():
         print(e)
 
 def test_long():
-    rxns = chemkin('tests/test_xml/rxnset_long.xml')
+    reactions = chemkin('tests/test_xml/rxnset_long.xml')
     x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
     T = 1500
-    print(rxns.reaction_rate(x, T))
+    print(reactions.reaction_rate(x, T))
     expect = np.array([ -7.10942556e+12,  -1.58164670e+13,   2.20952666e+13,
         -1.65522031e+12,   1.12504921e+13,   0.00000000e+00,
          1.66470929e+13,  -2.54117388e+13])
-    assert str(rxns.reaction_rate(x, T)) == str(expect)
+    assert all(reactions.reaction_rate(x, T).astype(int) == expect.astype(int))
 
 def test_reversible():
-    rxns = chemkin('tests/test_xml/rxns_reversible.xml')
+    reactions = chemkin('tests/test_xml/rxns_reversible.xml')
     x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
     T = 1500
-    print(rxns.reaction_rate(x,T))
+    expect = np.array([  3.77689350e+14,  -3.81148508e+14,  -4.18872924e+14,   6.96275658e+12,
+   3.07172197e+13,   3.93416746e+14,   1.66470991e+13,  -2.54117388e+13])
+    assert all(reactions.reaction_rate(x, T).astype(int) == expect.astype(int))
