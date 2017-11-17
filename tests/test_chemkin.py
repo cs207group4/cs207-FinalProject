@@ -79,6 +79,13 @@ def test_repr():
     assert repr(reactions).find("chemkin('tests/test_xml/rxns.xml', sql_name ") >= 0
     print(repr(reactions))
 
+def test_len():
+    """
+    test __len__ function
+    """
+    reactions = test_from_xml()
+    print(len(reactions))
+
 def test_str():
     """
     test __str__ function
