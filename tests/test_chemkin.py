@@ -23,7 +23,6 @@ def test_from_xml():
     testing normal reaction rate calculations from xml input
     """
     reactions = chemkin('tests/test_xml/rxns.xml')
-    reactions._set_rc_params(T=1000)
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
         -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     assert all(reactions.reaction_rate([1, 1, 1, 1, 1, 1], 1000).astype(int) == expect.astype(int))
@@ -35,7 +34,6 @@ def test_singlerxnxml():
     """testing that single reaction systems are handled correctly"""
 
     reactions = chemkin('tests/test_xml/rxns_single.xml')
-    reactions._set_rc_params(T=1000)
     expect = np.array([ -1.e4, -1.e4, 1.e4, 1.e4])
     assert all(reactions.reaction_rate([1,1,1,1],1000).astype(int) == expect.astype(int))
     return reactions
