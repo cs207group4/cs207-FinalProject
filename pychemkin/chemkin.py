@@ -1,11 +1,10 @@
-import xml.etree.ElementTree as ETs
 import numpy as np
-from collections import OrderedDict
+from os import path
 from .SQLParser import SQLParser
 from .InputParser import InputParser
 from .ReactionCoeffs import ReactionCoeffs
 from .BackwardCoeffs import BackwardCoeffs
-from os import path
+
 
 class chemkin:
 
@@ -149,7 +148,7 @@ class chemkin:
 
         #initialize progress rate vector
         kf = np.array([rc.k_forward() for rc in self.rc_list])
-        pr = kf* np.product(x ** self.nu_react, axis=0)
+        pr = kf * np.product(x ** self.nu_react, axis=0)
 
         if np.any(self.reversible):
             pr[self.reversible] = pr[self.reversible] - self.bc.backward_coeffs(kf[self.reversible], self.T) \

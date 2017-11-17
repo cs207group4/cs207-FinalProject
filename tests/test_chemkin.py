@@ -141,3 +141,11 @@ def test_singlereversible():
     T = 1500
     expect = np.array([  2.97178272e+14,   2.97178272e+14,  -2.97178272e+14,  -2.97178272e+14])
     assert all(reactions.reaction_rate(x, T).astype(int) == expect.astype(int))
+    
+def test_mixedreversible():
+    reactions = chemkin('tests/test_xml/rxnset_mixedreversible_long.xml')
+    x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
+    T = 1500
+    expect = np.array([ -1.51420660e+13,   1.22682375e+13,  -2.60415020e+13,   6.37742014e+12,
+   3.13025562e+13,   0.00000000e+00,  1.66470929e+13,  -2.54117388e+13])
+    assert all(reactions.reaction_rate(x, T).astype(int) == expect.astype(int))
