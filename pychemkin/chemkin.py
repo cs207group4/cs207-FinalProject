@@ -61,7 +61,14 @@ class chemkin:
             equationlist.append(reaction['equation'])
             rxn_types.append(reaction['type'])
             reversible.append(reaction['reversible'].strip().lower())
-        reversible = np.array(reversible) == 'yes'
+        
+        reversible = np.array(reversible)
+        
+        # check whether `reversible` is valid
+        if not np.all(np.logical_or(reversible == 'yes', reversible == 'no')):
+            raise ValueError('`reversible` should be either "yes" or "no".')
+        
+        reversible = reversible == 'yes'
 
         backward_coeffs = BackwardCoeffs(input_.nu_react[:, reversible], input_.nu_prod[:, reversible], input_.species, sql)
 

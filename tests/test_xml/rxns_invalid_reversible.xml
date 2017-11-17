@@ -36,7 +36,7 @@
         </reaction>
 
         <!-- reaction 03 -->
-        <reaction reversible="no" type="Elementary" id="reaction03">
+        <reaction reversible="unknown" type="Elementary" id="reaction03">
             <equation>H2 + OH =] H2O + H</equation>
             <rateCoeff>
                 <Constant>

@@ -62,6 +62,17 @@ def test_construct_nonelementary():
         assert type(e)==NotImplementedError
         print(e)
 
+def test_invalid_reversible():
+    """
+    test that chemkin object handles invalid reversible input as expected
+    """
+    
+    try:
+        reactions = chemkin('tests/test_xml/rxns_invalid_reversible.xml')
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+        
 def test_repr():
     """
     test override of __repr__ function
