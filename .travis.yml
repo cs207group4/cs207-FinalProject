@@ -25,6 +25,8 @@ script:
     - pip install virtualenv
     - virtualenv tmpenv
     - source tmpenv/bin/activate
+    # DO NOT BUILD SCIPY --IT'S EVAL
+    - pip install numpy pandas scipy
     - python setup.py install
     - python setup.py test
     - deactivate
