@@ -48,7 +48,7 @@ setup(
 
     packages= ['pychemkin'],
 
-    install_requires=['numpy','scipy','pandas', 'sqlite3'],
+    install_requires=['numpy','scipy','pandas'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
