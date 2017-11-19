@@ -5,14 +5,23 @@ python:
 before_install:
     - pip install pytest pytest-cov coveralls
 script:
+    - mv pychemkin pychemkin_backup
+    - mv setup.py setup.py.backup
     - ls
-    - py.test
-after_success:
-    - coveralls
     
     # test install from pip
-    - rm -rf pychemkin
-    - rm -rf setup.py
     - pip install pychemkin
     - ls
     - py.test
+    
+    #recover
+    - mv pychemkin_backup pychemkin
+    - mv setup.py.backup setup.py
+    - ls
+    - pip uninstall --yes pychemkin
+    - python setup.py sdist --format=tar
+    - pip install dist/pychemkin-1.0.0.tar
+    - py.test
+    
+after_success:
+    - coveralls
