@@ -4,8 +4,7 @@ import numpy as np
 
 
 class InputParser:
-
-    """
+    '''
     The Input Parser class processes xml input used for subsequent chemical kinetics calculations
 
     Attributes
@@ -23,16 +22,14 @@ class InputParser:
     Finished reading xml input file
     >>> print(input_.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
-    """
-
-
+    '''
     def __init__(self, file_name):
-        """
+        '''
         INPUT
         =====
         file_name: string, required
                    name of xml input file
-        """
+        '''
         self.file_name = file_name
         self.raw = ET.parse(self.file_name).getroot()
         self.species = self.get_species()
@@ -42,9 +39,9 @@ class InputParser:
         print("Finished reading xml input file")
 
     def get_species(self):
-        """
+        '''
         Returns species array from xml file
-        """
+        '''
         try:
             species = self.raw.find('phase').find('speciesArray').text.strip().split()
         except AttributeError:
@@ -57,9 +54,9 @@ class InputParser:
 
 
     def get_reactions(self):
-        """
+        '''
         Returns list of dictionaries of information about each reaction in the xml file
-        """
+        '''
         def parse_rate_coeff(reaction, reaction_dict):
             rc_ = reaction.findall('rateCoeff')
             if len(rc_) > 1:
@@ -133,9 +130,9 @@ class InputParser:
         return reactions
 
     def get_nu(self):
-        """
+        '''
         Return tuple of arrays corresponding to stoichiometric coefficients for reactants and for products
-        """
+        '''
 
         nu_react = np.zeros((len(self.species), len(self.reactions)), dtype = int)
         nu_prod = np.zeros((len(self.species), len(self.reactions)), dtype = int)

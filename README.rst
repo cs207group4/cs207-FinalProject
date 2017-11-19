@@ -10,3 +10,5 @@ coefficients for the reactants and products, and the rate coefficient parameters
 A for Arrhenius rates). For a given system, the user can then specify a temperature and
 a vector of species concentrations in order to return the reaction rates in the form of a
 NumPy array. Rate coefficients and reaction progress rates can also be retrieved.
+
+Further documentation is in 'docs/usermanual.pdf' within the source file.

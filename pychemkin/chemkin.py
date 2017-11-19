@@ -1,5 +1,5 @@
-import numpy as np
 from os import path
+import numpy as np
 from .SQLParser import SQLParser
 from .InputParser import InputParser
 from .ReactionCoeffs import ReactionCoeffs
@@ -9,21 +9,20 @@ from .BackwardCoeffs import BackwardCoeffs
 class chemkin:
 
     '''
-    This class Chemkin computes the the reaction rates/ progress rates of the species
-    at each temperature of interest given species concentrations
-    INPUTS
-    =======
-    Using an XML file, the class calls InputParser and ReactionCoeffs to calculate the reaction rates
-    RETURNS
+    This chemkin module computes the the reaction rates/ progress rates of the species
+    given the temperature and species concentrations
+
+    METHODS and ATTRIBUTES
     ========
     After initialization, user could call:
      - reaction_rate(x, T): method to calculate reaction rate given concentration x and temperature T.
-     - species: A sequence (list, array, tuple) containing sthe names of the species
+     - species: A sequence (list, array, tuple) containing the names of the species
      - progress_rate(x): calculate progress rate given x (assumes temperature is already set)
      - _set_rc_params(T=..., R=..., A=...): internal method to set params of reaction coeffs
+
     EXAMPLES
     =========
-    >>> chem = chemkin("tests/test_xml/rxns.xml", sql_name = "pychemkin/data/thermo.sqlite")
+    >>> chem = chemkin("tests/test_xml/rxns.xml")
     Finished reading xml input file
     >>> print(chem.species)
     ['H', 'O', 'OH', 'H2', 'H2O', 'O2']
@@ -32,24 +31,17 @@ class chemkin:
             -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
     '''
 
-    def __init__(self, file_name, sql_name = None):
+    def __init__(self, file_name):
         '''
         INPUT
         =====
         file_name: string, required
                    xml file containing species and chemical reaction information
-        sql_name: string, optional
-                Name of sqlite database holding the NASA thermodynamic data
         '''
         self.file_name = file_name
-        
-        if sql_name==None:
-            here = path.abspath(path.dirname(__file__))
-            sql_name = path.join(here, 'data/thermo.sqlite')
 
-        self.sql_name = sql_name
-        sql = SQLParser(sql_name)
         input_ = InputParser(file_name)
+
         self.rxndata = input_.reactions
         rc_list = [ReactionCoeffs(**params) for params in input_.rate_coeff_params]
         equationlist = []
@@ -60,16 +52,16 @@ class chemkin:
             equationlist.append(reaction['equation'])
             rxn_types.append(reaction['type'])
             reversible.append(reaction['reversible'].strip().lower())
-        
+
         reversible = np.array(reversible)
-        
+
         # check whether `reversible` is valid
         if not np.all(np.logical_or(reversible == 'yes', reversible == 'no')):
             raise ValueError('`reversible` should be either "yes" or "no".')
-        
+
         reversible = reversible == 'yes'
 
-        backward_coeffs = BackwardCoeffs(input_.nu_react[:, reversible], input_.nu_prod[:, reversible], input_.species, sql)
+        backward_coeffs = BackwardCoeffs(input_.nu_react[:, reversible], input_.nu_prod[:, reversible], input_.species)
 
         self.nu_react = input_.nu_react
         self.nu_prod = input_.nu_prod
@@ -100,7 +92,7 @@ class chemkin:
 
     def __repr__(self):
         class_name = type(self).__name__
-        args = "'{}', sql_name = '{}'".format(self.file_name, self.sql_name)
+        args = "'{}'".format(self.file_name)
         return class_name + "(" + args +")"
 
     def __len__(self):
@@ -108,15 +100,10 @@ class chemkin:
         return len(self.rc_list)
 
     def __str__(self):
-        if self.equations is not None:
-            eqn_str = "chemical equations:\n[\n" + "\n".join([str(eq_) for eq_ in self.equations]) + "\n]"
-        else:
-            eqn_str = "chemical equations: not specified"
-        if self.species is not None:
-
-            species_str = "species: " + (str(self.species) if self.species else "")
-        else:
-            species_str = "species: not specified"
+        print(self.equations)
+        eqn_str = "chemical equations:\n[\n" + "\n".join([str(eq_) for eq_ in self.equations]) + "\n]"
+        species_str = "species: " + str(self.species)
+        species_str = "species: not specified"
         nu_react_str = "nu_react:\n" + str(self.nu_react)
         nu_prod_str = "nu_prod:\n" + str(self.nu_prod)
         rc_str = "reaction coefficients:\n[\n" + "\n".join([str(rc_) for rc_ in self.rc_list]) + "\n]"

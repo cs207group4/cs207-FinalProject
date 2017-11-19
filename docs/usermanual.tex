@@ -24,14 +24,14 @@
 \newcommand{\Trans}{\mathsf{T}}
 
 \begin{document}
-\title{The \textsc{chemkin} User Manual}
+\title{The \textsc{pychemkin} User Manual}
 \author{Jane Huang, Kimia Mavon, Weidong Xu, Zeyu Zhao}
 \date{}
 \maketitle
 \section{Introduction}
 
 
-{\tt pychemkin} is a Python 3 library that computes the reaction rates of all species participating in a system of elementary reactions.
+{\tt pychemkin} is a Python 3 library that computes the reaction rates of species participating in a system of elementary reactions.
 
 \subsection{Key chemical concepts and terminology}
 
@@ -103,7 +103,7 @@ and
 \begin{equation}
 \frac{S_{i}}{R} = a_{i1}\ln\left(T\right) + a_{i2}T + \frac{1}{2}a_{i3}T^{2} + \frac{1}{3}a_{i4}T^{3} + \frac{1}{4}a_{i5}T^{4} + a_{i7}.
 \end{equation}
-These are known as the \textbf{NASA polynomials}. For each specie, there are two sets of coefficients $a_i$, the first of which is applicable at low temperatures and a second that is applicable at high temperatures. \texttt{chemkin} stores these coefficients (taken from \url{http://burcat.technion.ac.il/dir/}) in an SQL database and retrieves values for species requested by the user. 
+These are known as the \textbf{NASA polynomials}. For each specie, there are two sets of coefficients $a_i$, the first of which is applicable at low temperatures and a second that is applicable at high temperatures. \texttt{pychemkin} stores these coefficients (taken from \url{http://burcat.technion.ac.il/dir/}) in an SQL database and retrieves values for species requested by the user. 
 
 
 
@@ -111,25 +111,23 @@ These are known as the \textbf{NASA polynomials}. For each specie, there are two
 \section{Installation}
 
 \subsection{Where to find and download the code}
+\subsubsection{Using pip}
+\texttt{pychemkin} v. 0.1.1 is hosted on PyPi at \url{https://pypi.python.org/pypi/pychemkin}. To download and install the package, simply type 
+\texttt{pip install pychemkin} into your terminal.
+\subsubsection{Installing from source}
 
-The package is freely available at \url{https://github.com/cs207group4/cs207-FinalProject}. If you have a GitHub account, you can simply open your terminal and type
-\newline
-{\tt git clone git@github.com:cs207group4/cs207-FinalProject.git} \newline
-
-Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file. \newline
+To get the most up-to-date version, you can go to \url{https://github.com/cs207group4/cs207-FinalProject}. If you have a GitHub account, you can simply open your terminal and type {\tt git clone git@github.com:cs207group4/cs207-FinalProject.git}. Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file. Once you download the contents of the repository from GitHub, enter the directory and type {\tt python setup.py install} In order to run the test suite, you need to have \href{https://docs.pytest.org/en/latest/}{pytest} v. 3.00+ and \href{https://pypi.python.org/pypi/pytest-cov}{pytest-cov} v. 2.5+ installed. When you're in the top level of the package directory, type {\tt pytest} into the terminal. The results of the test code will be printed out to the terminal.
+ \newline
 
 \subsection{Dependencies}
 
-This package has dependencies that usually come standard with the Anaconda distribution, but are straightforward to install if you do not have them in your Python distribution. (Click on the individual package names to be directed to their website and installation instructions).
+This package has dependencies that usually come standard with the Anaconda distribution, but will otherwise automatically be installed for you if you use pip.
 \begin{itemize}
 \item \href{http://www.numpy.org/}{NumPy} v. 1.11+
 \item \href{https://www.sqlite.org/}{sqlite3} v. 3.13.0+
 \end{itemize}
 
 Earlier versions of these packages may work, but the code has only been validated on the listed versions. 
-
-\subsection{Running the test suite}
-In order to run the test suite, you need to have \href{https://docs.pytest.org/en/latest/}{pytest} v. 3.00+ and \href{https://pypi.python.org/pypi/pytest-cov}{pytest-cov} v. 2.5+ installed. Once you download the contents of the repository from GitHub, enter the directory and type {\tt pytest} into the terminal. The results of the test code will be printed out to the terminal.
 
 \section{Basic Usage and Examples}
 As an example of basic code usage, we consider the following system of elementary, irreversible reactions:
@@ -145,11 +143,11 @@ Reaction 1 has an Arrhenius rate coefficient with $A = 3.52\times 10^{10}$ and $
 
 
 \subsection{User-required input}
-In an xml input file, the user provides the species participating in the reactions, the chemical equations, the stoichiometric coefficients, and the rate coefficient parameters. See {\tt rxns.xml} in the repository folder for an example of how to format the input file. 
+In an xml input file, the user provides the species participating in the reactions, the chemical equations, the stoichiometric coefficients, and the rate coefficient parameters. See {\tt rxns.xml} in the {\tt tests/test\_xml} folder for an example of how to format the input file. 
 
 The xml file will be processed and stored in a {\tt chemkin} object as follows:
 \begin{lstlisting}[language = Python, basicstyle = \ttfamily, breaklines = True, columns = fullflexible]
->>>from chemkin import *
+>>>from pychemkin import chemkin
 >>>rxn_system = chemkin.from_xml('rxns.xml')
 Finished reading xml input file
 \end{lstlisting}
@@ -188,39 +186,40 @@ reaction types: [`Elementary', `Elementary', `Elementary']
 reversible: [`no', `no', `no']
 \end{lstlisting}
 
-\subsection{Computing rate coefficients}
-While the xml file provides the parameters for the functional form of the rate coefficient expression, a temperature (usually) has to be specified to compute the rate coefficient. Our package does this in the following manner:
-
-\begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
- >>> rc = ReactionCoeffs('Arrhenius', A = 1e7, E=1e3)
- >>> rc.set_params(T=1e2)
- >>> rc.kval()
-    3003549.0889639612
-\end{lstlisting}
-
-
-\subsection{Computing progress rates}
-The progress rate values $w_i$ can be computed in the following manner:
-\begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
->>>T = 1000 #K
->>>x = np.array([1,1,1,1,1,1])
->>> rxn_system.set_rc_params(T=1000)
->>>rxn_system.progress_rate(x)
-array([  6.55925729e+06,   2.69357993e+05,   1.00000000e+03])
-\end{lstlisting}
-
 
 \subsection{Computing reaction rates}
 Given the reaction data from a user-provided input file, the reaction rates can be computed for an arbitrary temperature and set of species concentrations.
 
 \begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
->>>T = 1000 #K
->>>x = np.array([1,1,1,1,1,1])
->>>rxn_system.reaction_rate_T(x,T)
+>>> T = 1000 #K
+>>> x = np.array([1,1,1,1,1,1])
+>>> rxn_system.reaction_rate_T(x,T)
 array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
             -2.70357993e+05,   1.00000000e+03,  -6.55925729e+06])
 \end{lstlisting}
 
-There are more use cases of our library, please refer to {\tt demo.ipynb}
+\subsection{Obtaining intermediate calculations}
+Rate coefficients and progress rates are calculated in the course of computing the reaction rates. While these methods do not have to be called by the user to obtain the reaction rates, they are accessible if the user wishes to obtain these values. 
+
+\subsubsection{Obtaining forward rate coefficients}
+While the xml file provides the parameters for the functional form of the rate coefficient expression, a temperature (usually) has to be specified to compute the rate coefficient. Our package does this in the following manner:
+
+\begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
+>>> from pychemkin import ReactionCoeffs
+>>> rc = ReactionCoeffs(`Arrhenius', A = 1e7, E=1e3)
+>>> rc.set_params(T=1e2)
+>>> rc.k_forward()
+    3003549.0889639612
+\end{lstlisting}
+
+
+\subsubsection{Obtaining progress rates}
+The progress rate values $w_i$ can be computed in the following manner:
+\begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
+>>> T = 1000 #K
+>>>  x = np.array([1,1,1,1,1,1])
+>>>  rxn_system.progress_rate(x,T)
+array([  6.55925729e+06,   2.69357993e+05,   1.00000000e+03])
+\end{lstlisting}
 
 \end{document}

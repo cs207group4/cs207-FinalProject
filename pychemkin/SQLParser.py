@@ -1,6 +1,6 @@
+import os
 import numpy as np
 import sqlite3
-import os
 import pandas as pd
 
 class SQLParser:
@@ -13,7 +13,7 @@ class SQLParser:
 
     EXAMPLES
     =========
-    >>> parser = SQLParser('pychemkin/data/thermo.sqlite')
+    >>> parser = SQLParser()
     >>> parser.get_multi_coeffs(['O','O2'], 700)
     array([[  3.16826710e+00,  -3.27931884e-03,   6.64306396e-06,
              -6.12806624e-09,   2.11265971e-12,   2.91222592e+04,
@@ -23,7 +23,7 @@ class SQLParser:
               3.65767573e+00]])
 
     '''
-    def __init__(self, sql_name):
+    def __init__(self):
         '''
         INPUT
         =====
@@ -31,9 +31,10 @@ class SQLParser:
                   Name of sqlite database containing the NASA thermodynamic data
         '''
         self.data = None
-        if not os.path.isfile(sql_name):
-            raise ValueError('Database {} does not exist'.format(sql_name))
-        self.sql_name = sql_name
+        here = os.path.abspath(os.path.dirname(__file__))
+        self.sql_name = os.path.join(here, 'data/thermo.sqlite')
+        if not os.path.isfile(self.sql_name):
+            raise ValueError('Database {} does not exist'.format(self.sql_name))
         self._sql2data()
 
     def _sql2data(self):
@@ -117,8 +118,10 @@ class SQLParser:
         return species_list
 
 
-    def sql2pandas(self, sql_name):
-        db = sqlite3.connect(sql_name)
+    def sql2pandas(self):
+        '''
+        '''
+        db = sqlite3.connect(self.sql_name)
         cursor = db.cursor()
         cols = ['SPECIES_NAME', 'TLOW', 'THIGH', 'COEFF_1', 'COEFF_2', 'COEFF_3', \
                 'COEFF_4', 'COEFF_5', 'COEFF_6', 'COEFF_7']

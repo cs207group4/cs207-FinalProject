@@ -41,7 +41,7 @@ def test_singlerxnxml():
 
 def test_reaction_rate():
     """
-    test wrapper function for specifying temp and concentration in the same function
+    test reaction rate claculation
     """
     reactions = test_from_xml()
     expect = np.array([ -6.28889929e+06,   6.28989929e+06,   6.82761528e+06,
@@ -64,27 +64,26 @@ def test_invalid_reversible():
     """
     test that chemkin object handles invalid reversible input as expected
     """
-    
+
     try:
         reactions = chemkin('tests/test_xml/rxns_invalid_reversible.xml')
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
-        
+
 def test_repr():
     """
     test override of __repr__ function
     """
     reactions = test_from_xml()
-    assert repr(reactions).find("chemkin('tests/test_xml/rxns.xml', sql_name ") >= 0
-    print(repr(reactions))
+    assert repr(reactions)=="chemkin('tests/test_xml/rxns.xml')"
 
 def test_len():
     """
     test __len__ function
     """
     reactions = test_from_xml()
-    print(len(reactions))
+    assert len(reactions)==3
 
 def test_str():
     """
@@ -92,10 +91,7 @@ def test_str():
     """
     reactions = test_from_xml()
     print(str(reactions))
-    reactions.equations = None
-    reactions.species = None
-    print(str(reactions))
-    
+
 def test_dimension_error():
     """
     check that inconsistencies in input params are handled correctly
@@ -151,7 +147,7 @@ def test_singlereversible():
     T = 1500
     expect = np.array([  2.97178272e+14,   2.97178272e+14,  -2.97178272e+14,  -2.97178272e+14])
     assert str(reactions.reaction_rate(x, T)) == str(expect)
-    
+
 def test_mixedreversible():
     reactions = chemkin('tests/test_xml/rxnset_mixedreversible_long.xml')
     x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
