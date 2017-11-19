@@ -12,10 +12,12 @@ script:
     
     # test install from pip
     - pip install pychemkin
+    - cd tests
     - ls
     - py.test
     
     #recover
+    - cd ..
     - mv pychemkin_backup pychemkin
     - mv setup.py.backup setup.py
     - ls
