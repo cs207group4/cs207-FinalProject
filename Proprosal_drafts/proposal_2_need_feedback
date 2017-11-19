@@ -1,0 +1,41 @@
+## hey guys, I'll make this to a .tex file later but I wanted to get your thoughts on a few other items.
+
+<b>Proposed Feature</b>
+
+Because chemical kinetics involves a series of differential equations, our team will be implementing differential equations (ODE) solvers.
+We want to design a package to allow for simulations of complex gas-phase chemical processes (i.e., those that cannot be solved by hand/analytically) and to facilitate understanding of the key processes.
+To do this, we require solving for the concentration of all species as a function of time, and a visualization module that will enable the user to identify key reactions within the chemical network at different times.
+
+Module 1: ChemSolver
+
+ChemSolver is a module built to wrap around SciPy's ODE solver for our chemical kinetic solution. There are 6 ways to solve our differential equation, to be specified by the user when callin ChemSolver.
+The differential equation we want to solve is f = (output of chemkin.reaction_rate(x,T). So the method we would have is ChemSolver.solve(f, timesteps, method = ODEmethod, outputmethod = outputmethod,*args), where *args are the extra arguments we have to pass through to SciPy. 
+
+The scipy.integrate library has two powerful routines, “ode” and “odeint,” for numerically solving systems of coupled first order ordinary differential equations. Odeint (ODE integrator) is robust and can handle both stiff and non-stiff problems. If users chose ODE, we will allow the user to choose from the following solvers, depending on the power of their equation: 
+
+\begin{itemize}
+\item ‘RK45’ (Explicit Runge-Kutta method of order 5(4))
+\item ‘RK23’ (Explicit Runge-Kutta method of order 3(2)) 
+\item ‘Radau’ (Implicit Runge-Kutta method of Radau IIA family of order 5.)
+\item ‘BDF’ (Implicit method based on Backward Differentiation Formulas.)
+\item ‘LSODA’ (Adams/BDF method with automatic stiffness detection and switching) 
+\end{itemize}
+
+“It might be useful to have a method allowing the user to do a bunch of models at once, to see how varying the input changes the production of species at the end.
+Chemsolver.runmodelgrid(array of starting concentrations, array of temperatures for each different model, outputfile)” <- Jane do you want to expand on this further? Is this something we all are comfortable building?
+
+The user may specify the output of ChemSolver to be ASCII or HDF5. 
+
+Module2: ChemVisualizer
+This module offers a visualization library for the output of ODE (GUYS: It should read from SQL no?) using Matplotlib and Pandas. Users will be able to plot concentrations by time at a fixed temperature and visualize the relation between species in a social network style visual.  In a plot, users may choose the number of species included in each plot and truncate or expand the time axis. In the network analysis, the user may chose which species to visualize, and differentiate between reactants, products.  The output will be an image using matplotlib.savefile.. 
+Jane do you want to expand on this? : ChemVisualizer.plotsimulation(inputfile, species = [list of species], timerange = timerange, yaxis = concentration, progress rate, reaction rate)
+Visualizing the species’ concentrations over time should allow the user to quickly identify these features of the chemical system: 
+What are the roles of species in the system (primarily reactants, primarily intermediates, primarily products). 
+What species consistently remain minor? 
+What bottlenecks are in the system?
+
+Additionally, Visualizing progress rates and reaction rates over time will help the user understand what the major sources and sinks are for a given species at a given time
+
+Running the model grid + visualization can help the user optimize input concentrations to get desired production levels. 
+
+Dependencies include SciPy, HDF5, Matplotlib
