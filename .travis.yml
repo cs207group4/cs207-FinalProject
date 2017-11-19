@@ -5,9 +5,14 @@ python:
 before_install:
     - pip install pytest pytest-cov coveralls
 script:
-    - python setup.py sdist --format=tar
     - ls
-    - pip install dist/pychemkin-0.1.0.tar
     - py.test
 after_success:
     - coveralls
+    
+    # test install from pip
+    - rm -rf pychemkin
+    - rm -rf setup.py
+    - pip install pychemkin
+    - ls
+    - py.test
