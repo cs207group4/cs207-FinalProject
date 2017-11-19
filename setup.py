@@ -18,7 +18,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='pychemkin',
 
-    version='1.0.5',
+    version='1.0.8',
 
     description='Chemical Kinetics Library',
     long_description=long_description,
@@ -55,7 +55,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     setup_requires = ['pytest-runner'],
-    tests_require = ['pytest','coverage'],
-
+    tests_require = ['pytest','coverage','coveralls','pytest-cov'],
+    test_suite='tests',
     include_package_data=True
 )

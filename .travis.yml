@@ -14,15 +14,25 @@ script:
     - pip install pychemkin
     - ls
     - py.test
-    
+
     #recover
     - mv pychemkin_backup pychemkin
     - mv setup.py.backup setup.py
     - ls
     - pip uninstall --yes pychemkin
+
+    # test python setup.py install & test
+    - pip install virtualenv
+    - virtualenv tmpenv
+    - source tmpenv/bin/activate
+    - python setup.py install
+    - python setup.py test
+    - deactivate
+    - rm -rf tmpenv
+
+    # test package build
     - python setup.py sdist --format=tar
     - pip install dist/pychemkin-1.0.5.tar
     - py.test
-    
 after_success:
     - coveralls
