@@ -18,7 +18,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='pychemkin',
 
-    version='0.1.0',
+    version='1.0.8',
 
     description='Chemical Kinetics Library',
     long_description=long_description,
@@ -31,20 +31,20 @@ setup(
     author_email = 'zzy8200@gmail.com',
 
     # Choose your license
-    license='GPLv3',
+    license='GNU General Public License v3 (GPLv3)',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Chemistry',
-        'License :: OSI Approved :: GPLv3 License',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
 
-    keywords=['kinetics'],
+    keywords= 'chemical kinetics',
 
     packages= ['pychemkin'],
 
@@ -54,8 +54,8 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    setup_requires = ['pytest-runner'],
-    tests_require = ['pytest','coverage'],
-
+    setup_requires = ['pytest-runner','numpy'],
+    tests_require = ['pytest','coverage','coveralls','pytest-cov'],
+    test_suite='tests',
     include_package_data=True
 )

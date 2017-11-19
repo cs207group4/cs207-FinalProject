@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage{fullpage,amsmath,amsfonts,mathpazo,microtype,nicefrac}
+\usepackage{fullpage,amsmath,amsfonts,mathpazo,microtype,nicefrac, graphicx}
 
 % Set-up for hypertext references
 \usepackage{hyperref,color,textcomp,listings}
@@ -222,4 +222,134 @@ The progress rate values $w_i$ can be computed in the following manner:
 array([  6.55925729e+06,   2.69357993e+05,   1.00000000e+03])
 \end{lstlisting}
 
+\subsection{Future features}
+\subsubsection{Motivation}
+
+We will design a package to allow for simulations of complex chemical processes (i.e., those that cannot be solved by hand/analytically) and to facilitate understanding of the key processes. Chemical kinetics simulations typically involve a series of coupled differential equations. Our package will solve these ODEs to obtain species concentrations as a function of time, and then visualize the results to enable the user to identify key reactions and species at different times.
+
+\subsubsection{How features will fit into the code base}
+
+Currently, the package computes reaction rates for an arbitrary number of species and elementary reactions for a single time step. These ODEs will be input into an ODE solver to yield progress rates, reaction rates, and concentrations for multiple time steps. The solutions will be written to an output file (csv or HDF5), which can then be read by a visualization module. 
+
+\subsubsection{Modules to realize the features}
+
+\subsubsection*{Module 1: ChemSolver}
+
+
+ChemSolver is a module built to wrap around SciPy's ODE solver to obtain reaction concentrations. The user can choose one of the five algorithms available in SciPy, specify the time range over which to solve the ODEs, and select the output format (csv or HDF5). The user also has the option of exploring parameter space by running a grid of simulations with a single function call. 
+
+ There are 5 ways to solve our differential equation, to be specified by the user when calling ChemSolver. The scipy.integrate library has two powerful routines, “ode” and “odeint,” for numerically solving systems of coupled first order ordinary differential equations. If users chose ODE, we will allow the user to choose from the following solvers, depending on their needs:
+ \begin{itemize}
+\item ‘RK45’ (Explicit Runge-Kutta method of order 5(4))
+\item ‘RK23’ (Explicit Runge-Kutta method of order 3(2))
+\item ‘Radau’ (Implicit Runge-Kutta method of Radau IIA family of order 5.)
+\item ‘BDF’ (Implicit method based on Backward Differentiation Formulas.)
+\item ‘LSODA’ (Adams/BDF method with automatic stiffness detection and switching)
+\end{itemize}
+ 
+The user may specify the output of ChemSolver to be csv or HDF5.
+\subsubsection*{Module2: ChemVis}
+
+This module offers a visualization library for the output of ODE. It would read in the data from HDF5 or csv using Pandas. For the first type of visualization, users will be able to plot progress rates, reaction rates, or concentrations as a function of time. The user will be able to select a subset of species or a subset of the time range. For the second type of visualization, the relationship between species will be plotted in a social network style visual. This will provide the user an alternate view of major pathways and key species in the system. The output will be an image made with Matplotlib.  
+
+
+
+\subsubsection{Methods to be implemented}
+Chemsolver methods
+The differential equation we want to solve is
+$$f = chemkin.reactionrate(X,T)$$
+where X is the concentration vector and T is the temperature. 
+The method we plan to write will be structured as:
+
+\begin{lstlisting}[language = Python, basicstyle = \ttfamily, breaklines = True, columns = fullflexible]
+>>> ChemSolver.solve(chemkin_object, X_initial,T, timesteps, odemethod = odemethod,  outputmethod = outputmethod, *args)
+\end{lstlisting}
+
+where *args are the extra arguments we have to pass through to SciPy.
+
+Chemkin is the chemkin object that will be used to compute reaction rates. 
+
+X can either be a one-dimensional array of length N (corresponding to N species for a single reaction system) or a two-dimensional array of length NxP, where P is the number of different starting concentrations that the user may wish to try. T is either a float or a float array of length P, depending on whether the user wants to run multiple simulations. 
+
+Timesteps is an array specifying the points in time for which the user wishes for the concentrations to be output. 
+
+The odemethod corresponds to one of the five SciPy ODE solver algorithms: 
+This method will solve the ODE. The user will be able to chose from 5 ODE solvers: 
+\begin{itemize}
+\item ‘RK45’ (Explicit Runge-Kutta method of order 5(4))
+\item ‘RK23’ (Explicit Runge-Kutta method of order 3(2))
+\item ‘Radau’ (Implicit Runge-Kutta method of Radau IIA family of order 5.)
+\item ‘BDF’ (Implicit method based on Backward Differentiation Formulas.)
+\item ‘LSODA’ (Adams/BDF method with automatic stiffness detection and switching)
+\end{itemize}
+
+The output method allows the user to select either csv or HDF5 as an output option. The function will output a single file consisting of columns corresponding to time, reaction rates, species progress rates, species concentrations. There will also be a header storing the chemical equations. 
+
+
+ChemVis Methods
+
+\begin{lstlisting}[language = Python, basicstyle = \ttfamily, breaklines = True, columns = fullflexible]
+>>> ChemVis.plot_time_series(simulationfile, yaxis = yaxisval, species = [list of species], timerange = timerange)
+\end{lstlisting}
+
+
+This method will allow users to visualize species’ reaction rates or concentrations over time, or the reaction progress rates over time. 
+
+Simulationfile is a string or a list of strings corresponding the the csv or HDF5 file(s) containing the simulation data to be plotted (from ChemSolver.solve).
+
+Yaxisval is the quantity to be plotted: reaction rate, progress rate, or concentration
+
+Species is a list of species to be plotted. If progress rate is chosen for yaxisval, only the progress rates for reactions involving those species will be plotted. 
+
+Timerange specifies the start and end time for the time series to be plotted (which can be a subset of the simulation run). 
+
+A mock-up of the output image is shown below
+
+
+
+\begin{figure}[h!]
+  \caption{This visual plots concentrations of two species over time. We can clearly see that Species 1 remains constant while Species 2 increases significantly. Users can alternatively choose reaction rates over time, or the reaction progress rates over time. }
+  \centering
+  \includegraphics[width=\textwidth]{pic1.png}
+\end{figure}
+
+\begin{lstlisting}[language = Python, basicstyle = \ttfamily, breaklines = True, columns = fullflexible]
+>>>ChemVis.plot_network(simulationfile,timepoint)
+\end{lstlisting}
+
+This is an alternative method for visualizing the relationship between the species in the network. 
+An example image is shown below of a 3-reaction system involving 6 species. Red lines indicate that the species directly react with one another. Single-headed arrows show which species are direct parents of other species. Double-headed arrows show which species interconvert. The sizes of the species bubbles can show relative concentration levels. 
+
+Simulationfile is the output csv or HDF5 file from ChemSolver. Timepoint is the point in time for which the plot is being generated
+
+
+
+\begin{figure}[h!]
+  \caption{This visual shows a 3-reaction system involving 6 species. Red lines indicate that the species directly react with one another. Single-headed arrows show which species are direct parents of other species. Double-headed arrows show which species interconvert. In future analysis, the package will offer the sizes of the species bubbles in relation to the relative concentration levels. }
+  \centering
+  \includegraphics[width=\textwidth]{22.png}
+\end{figure}
+
+\newpage
+
+
+\subsubsection{How to use the new feature}
+Visualizing the species’ concentrations over time should allow the user to quickly identify these features of the chemical system:
+
+\begin{itemize}
+
+\item What are the roles of species in the system (primarily reactants, primarily intermediates, primarily products).
+\item What bottlenecks are in the system?
+\item What species are produced in high quantities and which ones consistently remain minor?
+
+\end{itemize}
+
+Additionally, Visualizing progress rates and reaction rates over time will help the user understand what the major sources and sinks are for a given specie at a given time. 
+
+The option of run and visualize a grid of models will allow the user to quickly explore parameter space and tune the starting concentrations and temperature to achieve desired production levels. For example, if the user wants to minimize the production of H2O2 for a given reaction system, she can provide a matrix of initial concentrations and quickly identify which starting concentration vector will yield the desired results. 
+
+\subsubsection{External dependencies}
+External dependencies include SciPy, NumPy, HDF5, Matplotlib, and Pandas, in addition to NumPy and sqlite3 mentioned in Section 2.2. 
 \end{document}
+
+
