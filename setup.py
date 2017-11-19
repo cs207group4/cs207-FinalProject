@@ -44,7 +44,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
 
-    keywords=['chemical','kinetics'],
+    keywords= 'chemical kinetics',
 
     packages= ['pychemkin'],
 
