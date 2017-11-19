@@ -8,33 +8,23 @@ before_install:
 script:
     - mv pychemkin pychemkin_backup
     - mv setup.py setup.py.backup
-    - ls
-    
+    - ls   
     # test install from pip
     - pip install pychemkin
     - ls
     - py.test
-
     #recover
     - mv pychemkin_backup pychemkin
     - mv setup.py.backup setup.py
     - ls
     - pip uninstall --yes pychemkin
-
-    # test python setup.py install & test
-    - pip install virtualenv
-    - virtualenv tmpenv
-    - source tmpenv/bin/activate
+    # test package build
+    - python setup.py sdist --format=tar
+    - pip install dist/pychemkin-1.0.8.tar
+    - py.test    
     # DO NOT BUILD SCIPY --IT'S EVAL
     - pip install numpy pandas scipy
     - python setup.py install
     - python setup.py test
-    - deactivate
-    - rm -rf tmpenv
-
-    # test package build
-    - python setup.py sdist --format=tar
-    - pip install dist/pychemkin-1.0.8.tar
-    - py.test
 after_success:
     - coveralls
