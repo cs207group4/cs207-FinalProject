@@ -136,7 +136,7 @@ class BackwardCoeffs:
         Calculate backward reaction rate coefficients for a system of M reactions
         INPUT
         =====
-        kf: float or float array, required
+        kf: float array, required
             forward reaction rate coefficients
         T: float, required
            Temperature of reactor
