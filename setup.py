@@ -54,7 +54,7 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    setup_requires = ['pytest-runner'],
+    setup_requires = ['pytest-runner','numpy'],
     tests_require = ['pytest','coverage','coveralls','pytest-cov'],
     test_suite='tests',
     include_package_data=True

@@ -32,7 +32,7 @@ script:
 
     # test package build
     - python setup.py sdist --format=tar
-    - pip install dist/pychemkin-1.0.5.tar
+    - pip install dist/pychemkin-1.0.8.tar
     - py.test
 after_success:
     - coveralls
