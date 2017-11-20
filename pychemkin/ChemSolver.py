@@ -3,6 +3,37 @@ from scipy.integrate import solve_ivp
 from .chemkin import chemkin
 
 class ChemSolver:
+    '''
+    The ChemSolver module wrap around SciPy's ODE solver to obtain the evolution of concentrations and reaction 
+    rates over time
+    
+    METHODS and ATTRIBUTES
+    ========
+    After initialization, user could call:
+     - solve(y0, T, t_span, t_eval=None, **options): method to solve the differential equation given an initial value
+       of species concentrations:
+           dy / dt = chemkin.reaction_rate(y, T)
+           y(t0) = y0
+     - get_results(return_reaction_rate=True): method to return the solution of ODE, which includes an array of time 
+       points, an array of solution values (species concentrations) at each time point, and an array of species reaction 
+       rates (optional)
+     - grid_search(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different combinations
+       of starting concentrations and temperatures
+     - get_grid_search_result(): method to return the grid search starting conditions and results
+     
+    EXAMPLES
+    =========
+    >>> chem = chemkin("tests/test_xml/rxns.xml")
+    Finished reading xml input file
+    >>> y0 = np.ones(len(chem.species))
+    >>> T = 300
+    >>> t_span = [0, 0.003]
+    >>> cs = ChemSolver(chem).solve(y0, T, t_span, method='RK23')
+    >>> t, y, rr = cs.get_results()
+    >>> y[0]
+    array([ 1.        ,  1.15629864,  1.29624502,  1.41687655,  1.5192147 ,
+            1.60512333,  1.67676943,  1.73628759,  1.75927183])
+    '''
     def __init__(self, chem):
         self.chem = chem
         self._sol = None
