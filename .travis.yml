@@ -10,9 +10,9 @@ script:
     - mv setup.py setup.py.backup
     - ls   
     # test install from pip
-    - pip install pychemkin
-    - ls
-    - py.test
+    # - pip install pychemkin
+    # - ls
+    # - py.test
     #recover
     - mv pychemkin_backup pychemkin
     - mv setup.py.backup setup.py
