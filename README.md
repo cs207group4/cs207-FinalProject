@@ -6,7 +6,8 @@
 pychemkin is a Python 3 library that computes the reaction rates of species participating in a system of elementary gas-phase reactions.
 
 To install, you can simply enter   `pip install pychemkin` into the terminal.
-Further documentation is in 'docs/usermanual.pdf.'
+Further documentation is in 'docs/pychemkin.pdf.'
 
 Authors: CS207 Group 4
+
 License: GPL v. 3

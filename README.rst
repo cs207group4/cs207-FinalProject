@@ -11,4 +11,4 @@ A for Arrhenius rates). For a given system, the user can then specify a temperat
 a vector of species concentrations in order to return the reaction rates in the form of a
 NumPy array. Rate coefficients and reaction progress rates can also be retrieved.
 
-Further documentation is in 'docs/usermanual.pdf' within the source file.
+Further documentation is in 'docs/pychemkin.pdf' within the source file.
