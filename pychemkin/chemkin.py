@@ -60,7 +60,7 @@ class chemkin:
             raise ValueError('`reversible` should be either "yes" or "no".')
 
         reversible = reversible == 'yes'
-        species_reversible = np.sum(input_.nu_react[:, reversible] + input_.nu_prod[:, reversible], axis=1) > 0
+        species_reversible = (np.sum(input_.nu_react[:, reversible] + input_.nu_prod[:, reversible], axis=1) > 0).reshape(-1)
         
         backward_coeffs = BackwardCoeffs(input_.nu_react[species_reversible, reversible], \
                                          input_.nu_prod[species_reversible, reversible], input_.species[species_reversible])
