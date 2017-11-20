@@ -129,8 +129,9 @@ class chemkin:
         =======
         x: array or list, required
            A length-N vector specifying concentrations of the N species
-        T: float, optional
+        T: float, required
            Temperature in K
+           
         RETURNS
         ========
         Length-N array of reaction rates of species
@@ -153,12 +154,14 @@ class chemkin:
     def reaction_rate(self, x, T):
         '''
         Return reaction rates for a system of M reactions involving N species
+        
         INPUTS
         =======
         x: array or list, required
            A length-N vector specifying concentration of each specie
         T: float, optional
            Temperature in K
+           
         RETURNS
         ========
         R: Array of reaction rates of species (length N)

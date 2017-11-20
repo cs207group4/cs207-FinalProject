@@ -5,7 +5,7 @@ def test_solve():
     chem = chemkin("tests/test_xml/rxns.xml")
     y0 = np.ones(len(chem.species))
     T = 300
-    t_span = [0, 0.003]
+    t_span = (0, 0.003)
     cs = ChemSolver(chem).solve(y0, T, t_span, method='RK23')
     t, y, rr = cs.get_results(return_reaction_rate=False)
     assert rr is None
@@ -22,7 +22,7 @@ def test_solve():
 def test_grid_search():
     chem = chemkin("tests/test_xml/rxns.xml")
     cs = ChemSolver(chem)
-    t_span = [0, 0.003]
+    t_span = (0, 0.003)
     y0s = [np.ones(len(chem.species))*i for i in range(1, 4)]
     Ts = [300, 400]
     gs = cs.grid_search(y0s, Ts, t_span, method='RK23')
