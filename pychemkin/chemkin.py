@@ -65,7 +65,7 @@ class chemkin:
         else:
             species_reversible = np.array([False for _ in range(len(input_.species))])
 
-        if np.any(species_reversible):
+        if np.any(species_reversible) and np.any(reversible):
             the_shape = (np.sum(species_reversible),np.sum(reversible))
             backward_coeffs = BackwardCoeffs(input_.nu_react[:, reversible][species_reversible,:].reshape(the_shape), \
                                              input_.nu_prod[:, reversible][species_reversible,:].reshape(the_shape), \
