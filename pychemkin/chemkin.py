@@ -61,9 +61,9 @@ class chemkin:
 
         reversible = reversible == 'yes'
         species_reversible = (np.sum(input_.nu_react[:, reversible] + input_.nu_prod[:, reversible], axis=1) > 0).reshape(-1)
-        
+        self.reversible_species = np.array(input_.species)[species_reversible].tolist()
         backward_coeffs = BackwardCoeffs(input_.nu_react[species_reversible, reversible], \
-                                         input_.nu_prod[species_reversible, reversible], input_.species[species_reversible])
+                                         input_.nu_prod[species_reversible, reversible], self.reversible_species)
 
         self.nu_react = input_.nu_react
         self.nu_prod = input_.nu_prod
@@ -80,7 +80,6 @@ class chemkin:
         self.rxn_types = rxn_types
 
         self.reversible = reversible
-        self.species_reversible = species_reversible
         if np.any(np.array(self.rxn_types)!='Elementary'):
             raise NotImplementedError('Only elementary reactions accepted')
         self.T = None
