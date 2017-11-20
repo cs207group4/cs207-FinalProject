@@ -118,5 +118,6 @@ venv.bak/
 #other files
 .DS_Store
 
-#file for debugging
+#file for implementation and debugging
+implementation.ipynb
 debug.ipynb
