@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import warnings
 from scipy.integrate import solve_ivp
 from .chemkin import chemkin
@@ -11,15 +12,15 @@ class ChemSolver:
     METHODS and ATTRIBUTES
     ========
     After initialization, user could call:
-     - solve(y0, T, t_span, t_eval=None, **options): method to solve the differential equations given an initial value
-       of species concentrations:
+     - solve(y0, T, t_span, t_eval=None, **options): method to solve the differential equations given an initial 
+       value of species concentrations:
            dy / dt = chemkin.reaction_rate(y, T)
            y(t0) = y0
-     - get_results(return_reaction_rate=True): method to return the solution of ODEs, which includes an array of time 
-       points, an array of solution values (species concentrations) at each time point, and an array of species reaction 
-       rates (optional)
-     - grid_search(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different combinations
-       of starting concentrations and temperatures
+     - get_results(return_reaction_rate=True): method to return the solution of ODEs, which includes an array of 
+       time points, an array of solution values (species concentrations) at each time point, and an array of 
+       reaction rates (optional)
+     - grid_search(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different 
+       combinations of starting concentrations and temperatures
      - get_grid_search_result(): method to return the grid search starting conditions and results
      
     EXAMPLES
@@ -106,6 +107,7 @@ class ChemSolver:
         else:
             return t, y, None
         
+    
     def grid_search(self, y0s, Ts, t_span, return_reaction_rate=True, **options):
         '''Solve ODEs at user specified combinations of starting concentrations and temperatures
         
