@@ -140,10 +140,7 @@ class chemkin:
         if len(x) != self.nu_prod.shape[0]:
             raise ValueError("ERROR: The concentration vector x must be of length N, where N is the \
             number of species")
-        #check that concentrations are all non-negative:
-        if np.any(x<0):
-            raise ValueError("ERROR: All the species concentrations must be non-negative")
-
+        
         #initialize progress rate vector
         kf = np.array([rc.k_forward() for rc in self.rc_list])
         pr = kf * np.product(x ** self.nu_react, axis=0)
