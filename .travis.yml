@@ -14,10 +14,10 @@ script:
     # - ls
     # - py.test
     #recover
-    - mv pychemkin_backup pychemkin
-    - mv setup.py.backup setup.py
-    - ls
-    - pip uninstall --yes pychemkin
+    # - mv pychemkin_backup pychemkin
+    # - mv setup.py.backup setup.py
+    # - ls
+    # - pip uninstall --yes pychemkin
     # test package build
     - python setup.py sdist --format=tar
     - pip install dist/pychemkin-1.0.8.tar
