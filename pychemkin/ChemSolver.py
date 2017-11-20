@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 from scipy.integrate import solve_ivp
 from .chemkin import chemkin
 
@@ -69,6 +70,10 @@ class ChemSolver:
         def _ode(t, y0):
             return self.chem.reaction_rate(y0, T)
         self._sol = solve_ivp(_ode, t_span=t_span, y0=y0, t_eval=t_eval, **options)
+        if -1 == self._sol.status:
+            warnings.warn('Integration step failed.', Warning)
+        elif 1 == self._sol.status:
+            warnings.warn('A termination event occurred.', Warning)
         self.reaction_rate = None
         return self
     
