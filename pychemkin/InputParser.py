@@ -60,7 +60,7 @@ class InputParser:
         def parse_rate_coeff(reaction, reaction_dict):
             rc_ = reaction.findall('rateCoeff')
             if len(rc_) > 1:
-                raise NotImplementedError('ERROR: Only irreversible reactions are currently supported')
+                raise ValueError('ERROR: there are multiple `rateCoeff`s under a reaction')
             elif len(rc_)==0:
                 raise ValueError('Rate coefficient data appear to be missing')
             rc_ = rc_[0]
