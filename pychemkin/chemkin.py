@@ -145,7 +145,35 @@ class chemkin:
         if np.any(self.reversible):
             pr[self.reversible] = pr[self.reversible] -  kb * np.product(x ** self.nu_prod[:, self.reversible], axis=0)
         return pr
-
+    
+    def _progress_rate_init(self,x,T):
+        '''make x the right shape for calculating progress rate. Calculate kf and kb, which is needed for progress rate
+        calculation
+        
+        INPUTS
+        =======
+        x: array or list, required
+           A length-N vector specifying concentrations of the N species
+        T: float, required
+           Temperature in K
+           
+        RETURNS
+        =======
+        x: reshaped x
+        kf: forward coef
+        kb: backward coef
+        '''
+        self._set_rc_params(T=T)
+        x = np.array(x).reshape(-1,1)
+        if len(x) != self.nu_prod.shape[0]:
+            raise ValueError("ERROR: The concentration vector x must be of length N, where N is the \
+            number of species")
+            
+        #initialize progress rate vector
+        kf = np.array([rc.k_forward() for rc in self.rc_list])
+        kb = self.bc.backward_coeffs(kf[self.reversible], self.T)
+        return x,kf,kb
+    
     def progress_rate(self, x, T):
         '''Return progress rate for a system of M reactions involving N species
 
@@ -160,15 +188,7 @@ class chemkin:
         ========
         Length-N array of reaction rates of species
         '''
-        self._set_rc_params(T=T)
-        x = np.array(x).reshape(-1,1)
-        if len(x) != self.nu_prod.shape[0]:
-            raise ValueError("ERROR: The concentration vector x must be of length N, where N is the \
-            number of species")
-            
-        #initialize progress rate vector
-        kf = np.array([rc.k_forward() for rc in self.rc_list])
-        kb = self.bc.backward_coeffs(kf[self.reversible], self.T)
+        x, kf, kb = self._progress_rate_init(x,T)
         return self._progress_rate_default_T(x,kf,kb)
 
     def reaction_rate(self, x, T):
