@@ -75,6 +75,8 @@ class ChemSolver:
             warnings.warn('Integration step failed.', Warning)
         elif 1 == self._sol.status:
             warnings.warn('A termination event occurred.', Warning)
+        self._t = self._sol.t
+        self._y = self._sol.y
         self.reaction_rate = None
         return self
     
@@ -97,8 +99,8 @@ class ChemSolver:
         '''
         if self._sol is None:
             raise ValueError('ODE not solved.')
-        t = self._sol.t
-        y = self._sol.y
+        t = self._t
+        y = self._y
         if return_reaction_rate and self.reaction_rate is None:
             self.reaction_rate = np.concatenate([self.chem.reaction_rate(y[:, i], self.T).\
                                                  reshape((y.shape[0], 1)) for i in range(y.shape[1])], axis=1)
@@ -107,6 +109,43 @@ class ChemSolver:
         else:
             return t, y, None
         
+    def save_results(self, file_name):
+        file_name = file_name.strip()
+        if not ('.csv' == file_name[-4:] or '.h5' == file_name[-3:]):
+            raise ValueError('Only csv and hdf5 are supported.')
+        if self._sol is None:
+            raise ValueError('ODE not solved.')
+        t = self._sol.t
+        y = self._sol.y
+        if self.reaction_rate is None:
+            self.reaction_rate = np.concatenate([self.chem.reaction_rate(y[:, i], self.T).\
+                                                 reshape((y.shape[0], 1)) for i in range(y.shape[1])], axis=1)
+        rr = self.reaction_rate
+        cols = ['t'] + ['{}-Concentration'.format(s) for s in self.chem.species] \
+        + ['{}-Reaction_rate'.format(s) for s in self.chem.species] + ['T']
+        values = np.concatenate((t.reshape(1, len(t)), y.reshape(len(y), len(t)), \
+                                 rr.reshape(len(rr), len(t)), self.T * np.ones((1, (len(t))))), axis=0)
+        df = pd.DataFrame.from_records(values, cols).transpose()
+        if '.csv' == file_name[-4:]:
+            df.to_csv(file_name, index=False)
+        else:
+            df.to_hdf(file_name, 'df',index=False)
+        return self    
+    
+    def load_results(self, file_name):
+        file_name = file_name.strip()
+        if not ('.csv' == file_name[-4:] or '.h5' == file_name[-3:]):
+            raise ValueError('Only csv and hdf5 are supported.')
+        if '.csv' == file_name[-4:]:
+            df = pd.read_csv(file_name)
+        else:
+            df = pd.read_hdf(file_name, 'df')
+        self._sol = True
+        self._t = df.t.values
+        self._y = df.iloc[:, 1:1+len(self.chem.species)].values.transpose()
+        self.reaction_rate = df.iloc[:, 1+len(self.chem.species):1+2*len(self.chem.species)].values.transpose()
+        self.T = df['T'][0]
+        return self
     
     def grid_search(self, y0s, Ts, t_span, return_reaction_rate=True, **options):
         '''Solve ODEs at user specified combinations of starting concentrations and temperatures
