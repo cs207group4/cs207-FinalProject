@@ -117,19 +117,15 @@ class ChemSolver:
             return t, y, self.reaction_rate
         else:
             return t, y, None
+    
+    def to_df(self):
+        '''Save the solution of ODEs to a pandas dataframe
         
-    def save_results(self, file_name):
-        '''Save the solution of ODEs to a csv or hdf5 file
+        RETURNS
+        =======
+        df: pandas data frame containing the solution
         
-        INPUT
-        ======
-        file_name: string, required
-            csv or hdf5 file to save the solution of ODEs
-            The file extension should be either .csv or .h5
         '''
-        file_name = file_name.strip()
-        if not ('.csv' == file_name[-4:] or '.h5' == file_name[-3:]):
-            raise ValueError('Only csv and hdf5 are supported.')
         if self._sol is None:
             raise ValueError('ODE not solved.')
         t = self._sol.t
@@ -142,7 +138,21 @@ class ChemSolver:
         + ['{}-Reaction_rate'.format(s) for s in self.chem.species] + ['T']
         values = np.concatenate((t.reshape(1, len(t)), y.reshape(len(y), len(t)), \
                                  rr.reshape(len(rr), len(t)), self.T * np.ones((1, (len(t))))), axis=0)
-        df = pd.DataFrame.from_records(values, cols).transpose()
+        return pd.DataFrame.from_records(values, cols).transpose()
+    
+    def save_results(self, file_name):
+        '''Save the solution of ODEs to a csv or hdf5 file
+        
+        INPUT
+        ======
+        file_name: string, required
+            csv or hdf5 file to save the solution of ODEs
+            The file extension should be either .csv or .h5
+        '''
+        file_name = file_name.strip()
+        if not ('.csv' == file_name[-4:] or '.h5' == file_name[-3:]):
+            raise ValueError('Only csv and hdf5 are supported.')
+        df = self.to_df()
         if '.csv' == file_name[-4:]:
             df.to_csv(file_name, index=False)
         else:
