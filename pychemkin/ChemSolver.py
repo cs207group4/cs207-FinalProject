@@ -71,12 +71,12 @@ class ChemSolver:
         '''
         self.T = T
         # get variables not changed in ODE
-        y0,kf,kb = self.chem._progress_rate_init(y0,T)
+        _,kf,kb = self.chem._progress_rate_init(y0,T)
         nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
         
         def _ode(t, y):
             nonlocal nu_diff_matrix, kf, kb
-            r = self.chem._progress_rate_default_T(y,kf,kb)
+            r = self.chem._progress_rate_default_T(y.reshape(-1,1),kf,kb)
             return np.sum(r * nu_diff_matrix, axis=1)
         
         self._sol = solve_ivp(_ode, t_span=t_span, y0=y0, t_eval=t_eval, **options)
