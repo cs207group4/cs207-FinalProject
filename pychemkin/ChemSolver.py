@@ -51,7 +51,7 @@ class ChemSolver:
         self.grid_condition = None
         self.grid_result = None
         
-    def __dy_dt(t, y):
+    def __dy_dt(self, t, y):
         r = self.chem._progress_rate_default_T(y.reshape(-1,1),self.kf,self.kb)
         return np.sum(r * self.nu_diff_matrix, axis=1)
     
