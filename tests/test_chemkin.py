@@ -117,7 +117,13 @@ def test_bad_x():
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
-
+    
+    try:
+        reactions.reaction_rate([[1],[-1],[1],[1],[1],[1]], 1000)
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+        
 def test_long():
     reactions = chemkin('tests/test_xml/rxnset_long.xml')
     x = np.array([2., 1., 0.5, 1., 1., 0., 0., 0.25])
