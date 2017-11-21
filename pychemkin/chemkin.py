@@ -121,6 +121,30 @@ class chemkin:
         rxn_str = "reaction types: " + str(self.rxn_types)
         reversible_str = "reversible: " + str(self.reversible)
         return "\n".join([eqn_str, species_str,nu_react_str,nu_prod_str,rc_str, rxn_str, reversible_str])
+    
+    def _progress_rate_default_T(self,x,kf,kb):
+        '''Return progress rate for a system of M reactions involving N species, with the stored T in the class
+        Sould not be used directly. Designed for ODE solver.
+
+        INPUTS
+        =======
+        x: array or list, required
+           A length-N vector specifying concentrations of the N species
+        T: float, required
+           Temperature in K
+           
+        RETURNS
+        ========
+        Length-N array of reaction rates of species
+        '''
+        if self.T == None:
+            raise ValueError("T not set! Please use _set_rc_params() to set T first!")
+        
+        pr = kf * np.product(x ** self.nu_react, axis=0)
+
+        if np.any(self.reversible):
+            pr[self.reversible] = pr[self.reversible] -  kb * np.product(x ** self.nu_prod[:, self.reversible], axis=0)
+        return pr
 
     def progress_rate(self, x, T):
         '''Return progress rate for a system of M reactions involving N species
@@ -141,15 +165,11 @@ class chemkin:
         if len(x) != self.nu_prod.shape[0]:
             raise ValueError("ERROR: The concentration vector x must be of length N, where N is the \
             number of species")
-        
+            
         #initialize progress rate vector
         kf = np.array([rc.k_forward() for rc in self.rc_list])
-        pr = kf * np.product(x ** self.nu_react, axis=0)
-
-        if np.any(self.reversible):
-            pr[self.reversible] = pr[self.reversible] - self.bc.backward_coeffs(kf[self.reversible], self.T) \
-            * np.product(x ** self.nu_prod[:, self.reversible], axis=0)
-        return pr
+        kb = self.bc.backward_coeffs(kf[self.reversible], self.T)
+        return self._progress_rate_default_T(x,kf,kb)
 
     def reaction_rate(self, x, T):
         '''
@@ -166,7 +186,6 @@ class chemkin:
         ========
         R: Array of reaction rates of species (length N)
         '''
-        self._set_rc_params(T=T)
         r = self.progress_rate(x, T)
 
         # Return an array...
