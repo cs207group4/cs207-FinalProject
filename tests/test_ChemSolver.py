@@ -39,6 +39,11 @@ def test_OED_not_solved():
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
+    try:
+        cs.save_results('tests/test_data/test.csv')
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
 
 def test_IO():
     chem = chemkin("tests/test_xml/rxns.xml")
@@ -52,3 +57,17 @@ def test_IO():
     cs2 = ChemSolver(chem).load_results('tests/test_data/test.h5')
     assert str(cs.get_results()) == str(cs1.get_results())
     assert str(cs1.get_results()) == str(cs2.get_results())
+
+def test_wrong_file_name():
+    chem = chemkin("tests/test_xml/rxns.xml")
+    cs = ChemSolver(chem)
+    try:
+        cs.save_results('test.pdf')
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+    try:
+        cs.load_results('test.pdf')
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
