@@ -115,9 +115,9 @@ class InputParser:
                 parse_rate_coeff(reaction, reactions[i])
                 try:
                     reactions[i]['equation'] = reaction.find('equation').text
-                    reactions[i]['reactants'] = {s.split(':')[0]:int(s.split(':')[1]) \
+                    reactions[i]['reactants'] = {s.split(':')[0]:float(s.split(':')[1]) \
                                          for s in reaction.find('reactants').text.split()}
-                    reactions[i]['products'] = {s.split(':')[0]:int(s.split(':')[1]) \
+                    reactions[i]['products'] = {s.split(':')[0]:float(s.split(':')[1]) \
                                          for s in reaction.find('products').text.split()}
 
                 except AttributeError:
@@ -125,7 +125,7 @@ class InputParser:
                     raise
 
                 except ValueError:
-                    print("Stoichiometric coefficients must be integers")
+                    print("Stoichiometric coefficients must be float numbers")
                     raise
         return reactions
 
