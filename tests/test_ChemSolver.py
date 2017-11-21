@@ -39,3 +39,16 @@ def test_OED_not_solved():
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
+
+def test_IO():
+    chem = chemkin("tests/test_xml/rxns.xml")
+    y0 = np.ones(len(chem.species))
+    T = 300
+    t_span = [0, 0.003]
+    cs = ChemSolver(chem).solve(y0, T, t_span, method='RK23')
+    cs.save_results('tests/test_data/test.csv')
+    cs.save_results('tests/test_data/test.h5')
+    cs1 = ChemSolver(chem).load_results('tests/test_data/test.csv')
+    cs2 = ChemSolver(chem).load_results('tests/test_data/test.h5')
+    assert str(cs.get_results()) == str(cs1.get_results())
+    assert str(cs1.get_results()) == str(cs2.get_results())
