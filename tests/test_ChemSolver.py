@@ -31,7 +31,7 @@ def test_grid_search():
     assert str(_y1) == str(_y2)
     print(_y1)
     
-def test_OED_not_solved():
+def test_ODE_not_solved():
     chem = chemkin("tests/test_xml/rxns.xml")
     cs = ChemSolver(chem)
     try:
