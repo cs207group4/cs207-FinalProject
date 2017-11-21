@@ -50,6 +50,10 @@ class ChemSolver:
         self.T = None
         self.grid_condition = None
         self.grid_result = None
+        
+    def __dy_dt(t, y):
+        r = self.chem._progress_rate_default_T(y.reshape(-1,1),self.kf,self.kb)
+        return np.sum(r * self.nu_diff_matrix, axis=1)
     
     def solve(self, y0, T, t_span, t_eval=None, **options):
         '''Solve ODEs
@@ -71,15 +75,9 @@ class ChemSolver:
         '''
         self.T = T
         # get variables not changed in ODE
-        _,kf,kb = self.chem._progress_rate_init(y0,T)
-        nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
-        
-        def _ode(t, y):
-            nonlocal nu_diff_matrix, kf, kb
-            r = self.chem._progress_rate_default_T(y.reshape(-1,1),kf,kb)
-            return np.sum(r * nu_diff_matrix, axis=1)
-        
-        self._sol = solve_ivp(_ode, t_span=t_span, y0=y0, t_eval=t_eval, **options)
+        _,self.kf,self.kb = self.chem._progress_rate_init(y0,T)
+        self.nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
+        self._sol = solve_ivp(self.__dy_dt, t_span=t_span, y0=y0, t_eval=t_eval, **options)
         if -1 == self._sol.status:
             warnings.warn('Integration step failed.', Warning)
         elif 1 == self._sol.status:
@@ -111,7 +109,7 @@ class ChemSolver:
         t = self._t
         y = self._y
         if return_reaction_rate and self.reaction_rate is None:
-            self.reaction_rate = np.concatenate([self.chem.reaction_rate(y[:, i], self.T).\
+            self.reaction_rate = np.concatenate([self.__dy_dt(0, y[:, i]).\
                                                  reshape((y.shape[0], 1)) for i in range(y.shape[1])], axis=1)
         if return_reaction_rate:
             return t, y, self.reaction_rate
@@ -131,7 +129,7 @@ class ChemSolver:
         t = self._sol.t
         y = self._sol.y
         if self.reaction_rate is None:
-            self.reaction_rate = np.concatenate([self.chem.reaction_rate(y[:, i], self.T).\
+            self.reaction_rate = np.concatenate([self.__dy_dt(0, y[:, i]).\
                                                  reshape((y.shape[0], 1)) for i in range(y.shape[1])], axis=1)
         rr = self.reaction_rate
         cols = ['t'] + ['{}-Concentration'.format(s) for s in self.chem.species] \
