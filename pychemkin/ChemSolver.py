@@ -19,6 +19,8 @@ class ChemSolver:
      - get_results(return_reaction_rate=True): method to return the solution of ODEs, which includes an array of 
        time points, an array of solution values (species concentrations) at each time point, and an array of 
        reaction rates (optional)
+     - save_results(file_name): method to save the solution of ODEs to a csv or hdf5 file.
+     - load_results(file_name): method to load the solution of ODEs from a csv or hdf5 file storing the data
      - grid_search(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different 
        combinations of starting concentrations and temperatures
      - get_grid_search_result(): method to return the grid search starting conditions and results
@@ -110,6 +112,14 @@ class ChemSolver:
             return t, y, None
         
     def save_results(self, file_name):
+        '''Save the solution of ODEs to a csv or hdf5 file
+        
+        INPUT
+        ======
+        file_name: string, required
+            csv or hdf5 file to save the solution of ODEs
+            The file extension should be either .csv or .h5
+        '''
         file_name = file_name.strip()
         if not ('.csv' == file_name[-4:] or '.h5' == file_name[-3:]):
             raise ValueError('Only csv and hdf5 are supported.')
@@ -133,6 +143,14 @@ class ChemSolver:
         return self    
     
     def load_results(self, file_name):
+        '''Load the solution of ODEs from a csv or hdf5 file
+        
+        INPUT
+        ======
+        file_name: string, required
+            csv or hdf5 file containing the solution of ODEs
+            The file extension should be either .csv or .h5
+        '''
         file_name = file_name.strip()
         if not ('.csv' == file_name[-4:] or '.h5' == file_name[-3:]):
             raise ValueError('Only csv and hdf5 are supported.')
