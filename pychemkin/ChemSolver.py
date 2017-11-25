@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import warnings
-from scipy.integrate import solve_ivp
+from scipy.integrate import ode
 from .chemkin import chemkin
 
 class ChemSolver:
@@ -55,7 +55,7 @@ class ChemSolver:
         r = self.chem._progress_rate_default_T(y.reshape(-1,1),self.kf,self.kb)
         return np.sum(r * self.nu_diff_matrix, axis=1)
     
-    def solve(self, y0, T, t_span, t_eval=None, **options):
+    def solve(self, y0, T, t1, dt, method='lsoda', **options):
         '''Solve ODEs
         
         INPUTS
@@ -64,26 +64,29 @@ class ChemSolver:
             A length-n vector specifying initial concentrations of the n species
         T: float, required
             Temperature in K
-        t_span: 2-tuple of floats, required
-            Interval of integration (t0, tf). The solver starts with t=t0 and integrates until it reaches t=tf.
-        t_eval: array_like or None, optional
-            Times at which to store the computed solution, must be sorted and lie within t_span. 
-            If None (default), use points selected by a solver.
+        t1: float, required
+            Integration end point. The solver starts with t=0 and integrates until it reaches t=t1.
+        dt: float, required
+            Integration step.
+        method: string, optional
+            Integration algorithm. default value is 'lsoda'
         **options:
-            Options passed to scipy.integrate.solve_ivp
-            see https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html for details
+            Options passed to scipy.integrate.ode.set_integrator
         '''
         self.T = T
         # get variables not changed in ODE
-        _,self.kf,self.kb = self.chem._progress_rate_init(y0,T)
+        _,self.kf, self.kb = self.chem._progress_rate_init(y0, T)
         self.nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
-        self._sol = solve_ivp(self.__dy_dt, t_span=t_span, y0=y0, t_eval=t_eval, **options)
-        if -1 == self._sol.status:
-            warnings.warn('Integration step failed.', Warning)
-        elif 1 == self._sol.status:
-            warnings.warn('A termination event occurred.', Warning)
-        self._t = self._sol.t
-        self._y = self._sol.y
+        r = ode(self.__dy_dt).set_integrator(method, **options)
+        r.set_initial_value(y0, 0)
+        self._t = [0]
+        self._y = [y0]
+        while r.successful() and r.t <= t1:
+            self._t.append(r.t + dt)
+            self._y.append(r.integrate(r.t + dt))
+        self._t = np.array(self._t)
+        self._y = np.array(self._y).transpose()
+        self._sol = True
         self.reaction_rate = None
         return self
     
@@ -126,8 +129,8 @@ class ChemSolver:
         '''
         if self._sol is None:
             raise ValueError('ODE not solved.')
-        t = self._sol.t
-        y = self._sol.y
+        t = self._t
+        y = self._y
         if self.reaction_rate is None:
             self.reaction_rate = np.concatenate([self.__dy_dt(0, y[:, i]).\
                                                  reshape((y.shape[0], 1)) for i in range(y.shape[1])], axis=1)
@@ -180,7 +183,7 @@ class ChemSolver:
         self.T = df['T'][0]
         return self
     
-    def grid_search(self, y0s, Ts, t_span, return_reaction_rate=True, **options):
+    def grid_search(self, y0s, Ts, t1, dt, method='lsoda', return_reaction_rate=True, **options):
         '''Solve ODEs at user specified combinations of starting concentrations and temperatures
         
         INPUTS
@@ -189,16 +192,19 @@ class ChemSolver:
             A n_y_cond X n array specifying n_y_cond groups of initial concentrations of the n species
         T: array_like, shape(n_T_cond,), required
             A length-n_T_cond vector specifying n_T_cond temperatures in K
-        t_span: 2-tuple of floats, required
-            Interval of integration (t0, tf). The solver starts with t=t0 and integrates until it reaches t=tf.
+        t1: float, required
+            Integration end point. The solver starts with t=0 and integrates until it reaches t=t1.
+        dt: float, required
+            Integration step.
+        method: string, optional
+            Integration algorithm. default value is 'lsoda'
         return_reaction_rate: bool, optional
             If True (default), calculate reaction rates
         **options:
-            Options passed to scipy.integrate.solve_ivp
-            see https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html for details
+            Options passed to scipy.integrate.set_integrator
         '''
-        self.grid_result = {T:[self.solve(y0, T, t_span, **options).get_results(return_reaction_rate) \
-                            for y0 in y0s] for T in Ts}
+        self.grid_result = {T:[self.solve(y0, T, t1, dt, method, **options).\
+                               get_results(return_reaction_rate) for y0 in y0s] for T in Ts}
         self.grid_condition = [Ts, y0s] 
         self._sol = None
         self.reaction_rate = None

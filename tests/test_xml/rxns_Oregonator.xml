@@ -25,7 +25,7 @@
             <equation>X + Y =] P</equation>
             <rateCoeff>
                 <Constant>
-                    <k>1.6e+09</k>
+                    <k>1.6e+9</k>
                 </Constant>
             </rateCoeff>
             <reactants>X:1 Y:1</reactants>
