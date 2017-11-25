@@ -31,12 +31,13 @@ class ChemSolver:
     Finished reading xml input file
     >>> y0 = np.ones(len(chem.species))
     >>> T = 300
-    >>> t_span = (0, 0.003)
-    >>> cs = ChemSolver(chem).solve(y0, T, t_span, method='RK23')
+    >>> t1 = 0.003
+    >>> dt = 5e-4
+    >>> cs = ChemSolver(chem).solve(y0, T, t1, dt, method='lsoda')
     >>> t, y, rr = cs.get_results()
     >>> y[0]
-    array([ 1.        ,  1.15629864,  1.29624502,  1.41687655,  1.5192147 ,
-            1.60512333,  1.67676943,  1.73628759,  1.75927183])
+    array([ 1.        ,  1.33595309,  1.50445961,  1.60586923,  1.6736715 ,
+            1.72223577,  1.75875481,  1.78722939])
     '''
     def __init__(self, chem):
         '''
