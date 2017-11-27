@@ -32,7 +32,7 @@ class SQLParser:
         '''
         self.data = None
         here = os.path.abspath(os.path.dirname(__file__))
-        self.sql_name = os.path.join(here, 'data/thermo.sqlite')
+        self.sql_name = os.path.join(here, 'data/thermo_all.sqlite')
         if not os.path.isfile(self.sql_name):
             raise ValueError('Database {} does not exist'.format(self.sql_name))
         self._sql2data()
