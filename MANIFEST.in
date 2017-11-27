@@ -1,1 +1,1 @@
-include pychemkin/data/thermo.sqlite
+include pychemkin/data/thermo_all.sqlite
