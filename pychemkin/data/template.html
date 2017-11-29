@@ -129,7 +129,7 @@
 </head>
 <body>
     <section class="page-header">
-      <h1 class="project-name">HTML Pychemkin Report</h1>
+      <h1 class="project-name">Pychemkin Report</h1>
       <!--<h2 class="project-tagline">Cayman is a clean, responsive theme for GitHub Pages.</h2>-->
     </section>
 
@@ -144,20 +144,32 @@
 
 <h1 id="rsystem">Reaction System</h1>
 
-<p style="color:red">Temperature: $temperature$ K</p>
+<p style="color:red">Temperature: $temperature$K</p>
 
-$reaction_system$
+ <table>
+  <thead>
+    <tr>
+      <th>Reaction</th>
+      <th>Forward Reaction Coeff</th>
+      <th>Backward Reaction Coeff</th>
+    </tr>
+  </thead>
+  <tbody>
+    $reaction_system$
+  </tbody>
+</table>
 
-<h1 id="rcondition">ODE Solving Result</h1>
-<h2>Initial Condition</h2>
 
-$ini_cond$
+<h1 id="rconc">ODE Solving Result</h1>
+<h2>Initial Concentration</h2>
 
-<h2>Ending Condition (t = $end_time$)</h2>
+$ini_conc$
 
-$end_cond$
+<h2>Ending Concentration (t = $end_time$)</h2>
 
-<p style="color:red">$is_equilibrium$</p>
+$end_conc$
+
+$is_equilibrium$
 
 <h1 id="viz">Visualization</h1>
 <h2>Reaction Network</h2>
