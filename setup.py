@@ -48,7 +48,7 @@ setup(
 
     packages= ['pychemkin'],
 
-    install_requires=['numpy>=1.13.3','scipy>=1.0.0','pandas>=0.20.3','tables>=3.4.2'],
+    install_requires=['numpy>=1.13.3','scipy>=1.0.0','pandas>=0.20.3','tables>=3.4.2','matplotlib'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

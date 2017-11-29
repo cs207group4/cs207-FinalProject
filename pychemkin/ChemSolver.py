@@ -4,6 +4,7 @@ import warnings
 from scipy.integrate import ode
 from .chemkin import chemkin
 
+
 class ChemSolver:
     '''
     The ChemSolver module wrap around SciPy's ODE solver to obtain the evolution of concentrations and reaction
@@ -157,7 +158,23 @@ class ChemSolver:
             return t, y, self.reaction_rate
         else:
             return t, y, None
-
+        
+    def is_equilibrium(self,tol=1e-5):
+        '''If the reaction system has reached equilibrium
+        
+        INPUT
+        =======
+        tol: allowed error. If all derivatives less than tol, system will be considered equilibrium
+        
+        RETURN
+        =======
+        is_equilibrium: bool. Indicate equilibrium or not
+        '''
+        
+        if self._sol is None:
+            raise ValueError('ODE not solved.')
+        return np.all(np.abs(self.__dy_dt(0, self._y[:,-1]))<tol)
+    
     def to_df(self):
         '''Save the solution of ODEs to a pandas dataframe
 

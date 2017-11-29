@@ -16,3 +16,4 @@ from .BackwardCoeffs import BackwardCoeffs
 from .ReactionCoeffs import ReactionCoeffs
 from .chemkin import chemkin
 from .ChemSolver import ChemSolver
+from .ChemViz import ChemViz
