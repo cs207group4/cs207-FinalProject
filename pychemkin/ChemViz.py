@@ -150,6 +150,8 @@ class ChemViz:
                     cur_reaction_str += ' +'
                 else:
                     if specie in specie_set:
+                        # remove the previous +
+                        cur_reaction_str = cur_reaction_str[:-2]
                         continue
                     specie_set.add(specie)
                     nu_react = self.chemsol.chem.nu_react[self.chemsol.chem.species.index(specie),reaction_cnt]
