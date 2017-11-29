@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from .chemkin import chemkin
 from .ChemSolver import ChemSolver
 import matplotlib as mpl
 mpl.use('Agg')
@@ -12,16 +13,34 @@ import re
 class ChemViz:
     '''
     The ChemViz module is for visualization of the ChemSolver result.
+    
+    METHODS and ATTRIBUTES
+    ========
+    After initialization, user could call:
+     - plot_network()
+     - plot_time_series()
+     - html_report(file_name): generate an HTML report for the solving result of the given system.
+     
+    EXAMPLES
+    =========
+    >>> chem = chemkin("tests/test_xml/rxns.xml")
+    Finished reading xml input file
+    >>> y0 = np.ones(len(chem.species))
+    >>> T = 300
+    >>> t1 = 0.003
+    >>> dt = 5e-4
+    >>> cs = ChemSolver(chem).solve(y0, T, t1, dt, method='lsoda')
+    >>> ChemViz(cs).html_report('report.html')
     '''
     def __init__(self, chemsol):
         '''
         INPUT
         =====
-        chem: chemkin object, required
+        chemsol: solved ChemSolver object, required
         '''
         self.chemsol = chemsol
         if self.chemsol._sol!=True:
-            raise ValueError('ChemSolver object must be solved before passed in ChemViz!')
+            raise ValueError('ChemSolver object must be solved before passed into ChemViz!')
 
     def plot_network(self):
         '''
@@ -42,12 +61,34 @@ class ChemViz:
         return fig
     
     def __species_encoding(self,species):
+        '''helper function to nicely format the species
+        '''
         return [re.sub(r"(\d)",r"<sub>\1</sub>",x) for x in species]
     
     def __conc_encoding(self,conc_array,species_array):
+        '''helper function to nicely format the concentration string
+        '''
         return ''.join(["<p>"+str(y)+":"+" "+str(x)+"</p>" for x,y in zip(conc_array,species_array)])
         
     def html_report(self,file_name):
+        '''Generate an HTML report of the reaction system dynamics.
+        It contains:
+            - the reactions system, conditions and coefficients
+            - initial and ending concentrations
+            - whether equilibrium has reached
+            - reaction network plot
+            - reaction time series
+        
+        INPUT
+        =======
+        file_name: a string indicating the path where the html file should goto. Must end with .html
+        
+        RETURN
+        =======
+        No return. Function will save an HTML file with the file_name as the file name.
+        
+        '''
+        
         # check file name
         if not ('.html' == file_name[-5:]):
             raise ValueError('The filename suffix must be .html.')
@@ -66,7 +107,7 @@ class ChemViz:
         here = os.path.abspath(os.path.dirname(__file__))
         template_f = os.path.join(here, 'data/template.html')
         if not os.path.isfile(template_f):
-            raise ValueError('Template does not exist. Please reinstall')
+            raise ValueError('HTMLTemplate does not exist. Please reinstall pychemkin.')
         with open(template_f,'r') as f:
             template_str = f.read()
 
