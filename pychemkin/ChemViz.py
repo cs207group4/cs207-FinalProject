@@ -36,7 +36,7 @@ class ChemViz:
         fig = plt.gcf()
         return fig
 
-    def html_report(self):
+    def html_report(self,file_name):
 
         # get base64 encoded string
         buf = io.BytesIO()
@@ -59,3 +59,7 @@ class ChemViz:
         # add plot
         template_str.replace("$base64_network$",network_str)
         template_str.replace("$base64_timeseries$",time_series_str)
+        if not ('.html' == file_name[-5:]):
+            raise ValueError('The filename suffix must be .html.')
+        with open(file_name,'w') as f:
+            f.write(template_str)
