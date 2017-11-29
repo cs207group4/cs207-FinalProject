@@ -24,16 +24,18 @@ class ChemViz:
         '''
         returns a figure, a place holder implementation
         '''
+        plt.ioff()
+        fig = plt.figure()
         plt.plot(range(10, 20))
-        fig = plt.gcf()
         return fig
 
     def plot_time_series(self):
         '''
         returns a series
         '''
+        plt.ioff()
+        fig = plt.figure()
         plt.plot(range(10, 20))
-        fig = plt.gcf()
         return fig
 
     def html_report(self,file_name):
@@ -57,8 +59,8 @@ class ChemViz:
             template_str = f.read()
 
         # add plot
-        template_str.replace("$base64_network$",network_str)
-        template_str.replace("$base64_timeseries$",time_series_str)
+        template_str = template_str.replace("$base64_network$",network_str)
+        template_str = template_str.replace("$base64_timeseries$",time_series_str)
         if not ('.html' == file_name[-5:]):
             raise ValueError('The filename suffix must be .html.')
         with open(file_name,'w') as f:
