@@ -120,7 +120,7 @@ class ChemSolver:
         r.set_initial_value(y0, 0)
         self._t = [0]
         self._y = [y0]
-        while r.successful() and r.t <= t1:
+        while r.successful() and r.t < t1:
             self._t.append(r.t + dt)
             self._y.append(r.integrate(r.t + dt))
         self._t = np.array(self._t)
