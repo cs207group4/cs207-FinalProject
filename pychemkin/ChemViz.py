@@ -131,10 +131,12 @@ class ChemViz:
         reaction_str = ''
         reaction_cnt = 0
         reverse_reaction_cnt = 0
+        
         for reaction in self.chemsol.chem.equations:
             reaction_str += '<tr>'
             cur_reaction_str = ''
             see_equal_sign = False
+            specie_set = set()
             for specie in reaction.split():
                 if specie.find('=]')!=-1:
                     if see_equal_sign:
@@ -147,6 +149,9 @@ class ChemViz:
                 elif specie=='+':
                     cur_reaction_str += ' +'
                 else:
+                    if specie in specie_set:
+                        continue
+                    specie_set.add(specie)
                     nu_react = self.chemsol.chem.nu_react[self.chemsol.chem.species.index(specie),reaction_cnt]
                     nu_prod = self.chemsol.chem.nu_prod[self.chemsol.chem.species.index(specie),reaction_cnt]
                     nu = nu_prod if see_equal_sign else nu_react
