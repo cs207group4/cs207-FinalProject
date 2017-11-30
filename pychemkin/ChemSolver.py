@@ -7,7 +7,7 @@ from .chemkin import chemkin
 
 class ChemSolver:
     '''
-    The ChemSolver module wrap around SciPy's ODE solver to obtain the evolution of concentrations and reaction
+    The ChemSolver module wraps around SciPy's ODE solver to obtain the evolution of concentrations and reaction
     rates over time
 
     METHODS and ATTRIBUTES
