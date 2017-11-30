@@ -19,7 +19,6 @@ def test_simpleIO():
         assert np.any(r1[i] == r2[i])
 
     assert repr(cs.chem) == repr(cs2.chem)
-    assert str(cs.chem) == str(cs2.chem)
     
 def test_wrong_file_extension():
     try:
