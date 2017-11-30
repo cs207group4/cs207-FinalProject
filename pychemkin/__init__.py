@@ -10,6 +10,7 @@ A python library for computing chemical kinetics. For details, please refer to t
 
 '''
 
+from .simpleIO import simpleIO
 from .InputParser import InputParser
 from .SQLParser import SQLParser
 from .BackwardCoeffs import BackwardCoeffs
