@@ -159,7 +159,7 @@ class ChemSolver:
         else:
             return t, y, None
         
-    def is_equilibrium(self,tol=1e-5):
+    def is_equilibrium(self,tol=1.):
         '''If the reaction system has reached equilibrium
         
         INPUT
