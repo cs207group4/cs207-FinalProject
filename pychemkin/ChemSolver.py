@@ -214,7 +214,6 @@ class ChemSolver:
             df.to_csv(file_name, index=False)
         else:
             df.to_hdf(file_name, 'df',index=False)
-        return self
 
     def load_results(self, file_name):
         '''Load the solution of ODEs from a csv or hdf5 file
