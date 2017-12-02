@@ -114,7 +114,6 @@ class chemkin:
         print(self.equations)
         eqn_str = "chemical equations:\n[\n" + "\n".join([str(eq_) for eq_ in self.equations]) + "\n]"
         species_str = "species: " + str(self.species)
-        species_str = "species: not specified"
         nu_react_str = "nu_react:\n" + str(self.nu_react)
         nu_prod_str = "nu_prod:\n" + str(self.nu_prod)
         rc_str = "reaction coefficients:\n[\n" + "\n".join([str(rc_) for rc_ in self.rc_list]) + "\n]"
