@@ -243,6 +243,8 @@ class ChemSolver:
         self._y = df.iloc[:, 1:1+len(self.chem.species)].values.transpose()
         self.reaction_rate = df.iloc[:, 1+len(self.chem.species):1+2*len(self.chem.species)].values.transpose()
         self.T = df['T'][0]
+        _,self.kf, self.kb = self.chem._progress_rate_init(self._y.transpose()[0], self.T)
+        self.nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
         return self
 
     def grid_search(self, y0s, Ts, t1, dt, method='lsoda', return_reaction_rate=True, **options):

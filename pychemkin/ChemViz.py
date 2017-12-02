@@ -209,6 +209,7 @@ class ChemViz:
         outfile: String, required
                 Name of png file to save to, if desired
         """
+        plt.ioff()
         figsize = (7,14)
         fig = plt.figure(figsize = figsize)
         for i, t in enumerate(timepoints):
@@ -276,6 +277,7 @@ class ChemViz:
         listofsp = list(filtered_df.columns)
         filtered_df = filtered_df[listofsp]
         #make plot
+        plt.ioff()
         fig = plt.figure(figsize = (7,4))
 
         title = "Plot of {} vs. time".format(lowyaxis)
