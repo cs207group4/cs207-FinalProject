@@ -87,7 +87,7 @@ class ChemViz:
         Matplotlib Ax instance with the network subplot information
         """
         if timepoint < 0 or timepoint > self.end_time:
-            raise ValueError('Time point must be between 0 and {} seconds'.format(end_time))
+            raise ValueError('Time point must be between 0 and {} seconds'.format(self.end_time))
 
         T = self.chemsol.T #temperature in K
 
