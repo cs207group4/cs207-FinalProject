@@ -100,7 +100,7 @@ class ChemViz:
 
         conc = interp_conc(timepoint)
         rxnrate = interp_rxnrate(timepoint)
-        _,kf, kb = chemkinobj._progress_rate_init(np.ones_like(species), T) #putting in a dummy array for concentration just to get reaction rate coefficients
+        _,kf, kb = chemkinobj._progress_rate_init(np.ones(N), T) #putting in a dummy array for concentration just to get reaction rate coefficients
         #rescale the reaction coefficients in order to set connecting line weights
         mincoeff = np.min(np.concatenate((kf,kb)))
         normed_kf = np.log10(kf/mincoeff)
