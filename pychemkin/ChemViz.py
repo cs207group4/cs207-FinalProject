@@ -65,6 +65,7 @@ class ChemViz:
             print("WARNING: Last time point is {} s".format(self.end_time))
         return df[(df['t']<=tmax) & (df['t']>=tmin)]
 
+
     def subplot_network(self, fig, nrow, ncol, panel, timepoint):
         """
         Plots reaction diagram for a single timepoint
@@ -276,8 +277,6 @@ class ChemViz:
         filtered_df = filtered_df[listofsp]
         #make plot
         fig = plt.figure(figsize = (7,4))
-        ###?????? NEED TO WORK ON COLORZ
-        list_of_colors = ((33, 55, 66,))
 
         title = "Plot of {} vs. time".format(lowyaxis)
 
@@ -285,7 +284,7 @@ class ChemViz:
 
         for i,v in enumerate(species):
 
-            plt.plot(filtered_df['t'],filtered_df[v], label = self.__make_tex_string(v))
+            plt.plot(filtered_df['t'],filtered_df[v], label = self.__make_tex_string(v), color = plt.cm.jet((i+1)/(len(species))))
 
         plt.legend(bbox_to_anchor=(1.2, 0.5))
         plt.xlim(xmin = tmin, xmax = tmax)
