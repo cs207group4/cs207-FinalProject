@@ -110,7 +110,7 @@ class chemkin:
         '''return number of reactions'''
         return len(self.rc_list)
 
-    def __str__(self):
+    def summary(self,brief=True):
         eqn_str = "chemical equations:\n[\n" + "\n".join([str(eq_) for eq_ in self.equations]) + "\n]"
         species_str = "species: " + str(self.species)
         nu_react_str = "nu_react:\n" + str(self.nu_react)
@@ -118,7 +118,12 @@ class chemkin:
         rc_str = "reaction coefficients:\n[\n" + "\n".join([str(rc_) for rc_ in self.rc_list]) + "\n]"
         rxn_str = "reaction types: " + str(self.rxn_types)
         reversible_str = "reversible: " + str(self.reversible)
+        if brief:
+            return "\n".join([eqn_str,species_str,rc_str,reversible_str])
         return "\n".join([eqn_str, species_str,nu_react_str,nu_prod_str,rc_str, rxn_str, reversible_str])
+    
+    def __str__(self):
+        return self.summary(brief=False)
     
     def _progress_rate_default_T(self,x,kf,kb):
         '''Return progress rate for a system of M reactions involving N species, with the stored T in the class
