@@ -111,7 +111,6 @@ class chemkin:
         return len(self.rc_list)
 
     def __str__(self):
-        print(self.equations)
         eqn_str = "chemical equations:\n[\n" + "\n".join([str(eq_) for eq_ in self.equations]) + "\n]"
         species_str = "species: " + str(self.species)
         nu_react_str = "nu_react:\n" + str(self.nu_react)
