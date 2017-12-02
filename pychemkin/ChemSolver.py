@@ -32,13 +32,12 @@ class ChemSolver:
     Finished reading xml input file
     >>> y0 = np.ones(len(chem.species))
     >>> T = 300
-    >>> t1 = 0.003
-    >>> dt = 5e-4
+    >>> t1 = 0.001
+    >>> dt = 2e-4
     >>> cs = ChemSolver(chem).solve(y0, T, t1, dt, method='lsoda')
     >>> t, y, rr = cs.get_results()
     >>> y[0]
-    array([ 1.        ,  1.33595309,  1.50445961,  1.60586923,  1.6736715 ,
-            1.72223577,  1.75875481])
+    array([ 1.        ,  1.16784753,  1.28789036,  1.3780344 ,  1.44823276])
     '''
     def __init__(self, chem):
         '''
@@ -52,6 +51,7 @@ class ChemSolver:
         self.T = None
         self.grid_condition = None
         self.grid_result = None
+        self.finished = False
 
     def __dy_dt(self, t, y):
         r = self.chem._progress_rate_default_T(y.reshape(-1,1),self.kf,self.kb)
@@ -121,9 +121,16 @@ class ChemSolver:
         r.set_initial_value(y0, 0)
         self._t = [0]
         self._y = [y0]
-        while r.successful() and r.t < t1:
+        total_pts = t1/dt
+        while r.successful() and len(self._t)<total_pts:
             self._t.append(r.t + dt)
             self._y.append(r.integrate(r.t + dt))
+
+        #check whether integration completed properly
+        if len(self._t) == total_pts:
+            self.finished = True
+        else:
+            print("WARNING: Solver appears to have stopped prematurely. Try increasing nsteps or decreasing dt.")
         self._t = np.array(self._t)
         self._y = np.array(self._y).transpose()
         self._sol = True
@@ -158,23 +165,23 @@ class ChemSolver:
             return t, y, self.reaction_rate
         else:
             return t, y, None
-        
+
     def is_equilibrium(self,tol=1.):
         '''If the reaction system has reached equilibrium
-        
+
         INPUT
         =======
         tol: allowed error. If all derivatives less than tol, system will be considered equilibrium
-        
+
         RETURN
         =======
         is_equilibrium: bool. Indicate equilibrium or not
         '''
-        
+
         if self._sol is None:
             raise ValueError('ODE not solved.')
         return np.all(np.abs(self.__dy_dt(0, self._y[:,-1]))<tol)
-    
+
     def to_df(self):
         '''Save the solution of ODEs to a pandas dataframe
 
@@ -221,7 +228,7 @@ class ChemSolver:
         INPUT
         ======
         file_name: string, required
-            csv or hdf5 file containing the solution of ODEs
+            csv or hdf5 file containing the ODE solutions
             The file extension should be either .csv or .h5
         '''
         file_name = file_name.strip()
