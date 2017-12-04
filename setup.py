@@ -18,7 +18,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='pychemkin',
 
-    version='1.0.8',
+    version='1.1.0',
 
     description='Chemical Kinetics Library',
     long_description=long_description,
@@ -48,7 +48,7 @@ setup(
 
     packages= ['pychemkin'],
 
-    install_requires=['numpy>=1.13.3','scipy>=1.0.0','pandas>=0.20.3','tables>=3.4.2','matplotlib'],
+    install_requires=['numpy>=1.13.3','scipy>=1.0.0','pandas>=0.20.3','tables>=3.4.2','matplotlib>=2.0.2'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

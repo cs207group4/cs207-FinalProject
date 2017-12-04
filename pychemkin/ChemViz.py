@@ -19,9 +19,11 @@ class ChemViz:
 
     INSTANCE METHODS and ATTRIBUTES
     ========
-     - plot_network()
+     - plot_network(yaxis, species = None, tmin = 0, tmax = None, outputfile=None)
      - plot_time_series()
-     - html_report(file_name): generates an HTML report summarizing and visualizing the solutions of a given reaction system
+     - html_report(file_name)
+
+    See method doc for details
 
     EXAMPLE
     =========
