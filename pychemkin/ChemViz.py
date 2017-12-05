@@ -44,10 +44,11 @@ class ChemViz:
         chemsol: solved ChemSolver object, required
         '''
         self.chemsol = chemsol
-        if self.chemsol._sol!=True:
-            raise ValueError('ChemSolver object passed to ChemViz needs to have the solutions attribute set.')
-        self.df = chemsol.to_df()
-        self.end_time = self.df['t'][-1:].values[0] #last timepoint for which data is available
+        if self.chemsol._sol!=True and self.chemsol.grid_result is None:
+            raise ValueError('ChemSolver object passed to ChemViz needs to have the solutions attribute set or grid_result attribute set.')
+        if self.chemsol._sol:
+            self.df = chemsol.to_df()
+            self.end_time = self.df['t'][-1:].values[0]
 
     def _filterByTime(self, df, tmin, tmax):
         """
@@ -62,10 +63,11 @@ class ChemViz:
         tmax: Float, required
               End of desired interval
         """
+        end_time = df['t'][-1:].values[0]
         if tmin < 0:
             raise ValueError('Starting time has to be >=0 s')
-        if tmax > self.end_time:
-            print("WARNING: Last time point is {} s".format(self.end_time))
+        if tmax > end_time: #last timepoint for which data is available
+            print("WARNING: Last time point is {} s".format(end_time))
         return df[(df['t']<=tmax) & (df['t']>=tmin)]
 
 
@@ -201,7 +203,7 @@ class ChemViz:
 
         return ax
 
-    def plot_network(self, timepoints, outputfile = None):
+    def plot_network(self, timepoints, outputfile = None, figsize = (7,14)):
         """
         Make diagram of reaction network at one or more timepoints
 
@@ -212,8 +214,11 @@ class ChemViz:
         outfile: String, required
                 Name of png file to save to, if desired
         """
+        if self.chemsol._sol!=True:
+            raise ValueError('Check that ChemSolver object has solutions attribute set')
+
         plt.ioff()
-        figsize = (7,14)
+        figsize = figsize
         fig = plt.figure(figsize = figsize)
         for i, t in enumerate(timepoints):
             self._subplot_network(fig, len(timepoints), 1, i+1, t)
@@ -322,6 +327,9 @@ class ChemViz:
         outputfile: String, optional
              Name of png file to save to
         """
+        if self.chemsol._sol!=True:
+            raise ValueError('Check that ChemSolver object has solutions appropriately set.')
+
         plt.ioff()
         fig = plt.figure(figsize = (7,4))
 
