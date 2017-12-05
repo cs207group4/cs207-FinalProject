@@ -13,7 +13,7 @@ class ChemSolver:
     METHODS and ATTRIBUTES
     ========
     After initialization, the user can call:
-     - solve(y0, T, t_span, t_eval=None, **options): method to solve the differential equations given an initial
+     - solve(self, y0, T, t1, dt, algorithm='lsoda', **options): method to solve the differential equations given an initial
        value of species concentrations:
            dy / dt = chemkin.reaction_rate(y, T)
            y(t0) = y0
