@@ -69,42 +69,9 @@ class ChemSolver:
         '''
         r = self.chem._progress_rate_default_T(y.reshape(-1,1),self.kf,self.kb)
         return np.sum(r * self.nu_diff_matrix, axis=1)
-    """
-    Needs further testing
-    def _jac(self, t, y):
-        '''
-        Return Jacobian of right-hand side of concentration ODEs
 
-        INPUT
-        =====
-        '''
-        if self.T is None:
-            raise ValueError("T needs to be set")
-        N, M = self.chem.nu_react.shape
-        derivs = np.zeros((N,M))
-        y = np.array(y).reshape(-1,1)
-        #calculate partial derivatives of progress rates with respect to the species concentrations
-        for i in range(N):
-            prod1 = y**self.chem.nu_react
-            masked_prod1 = np.ma.array(prod1, mask = False)
-            masked_prod1[i] = True
-
-            derivs[i] =self.kf*self.chem.nu_react[i]*y[i]**(self.chem.nu_react[i]-1)*np.product(masked_prod1, axis =0)
-            if np.any(self.chem.reversible):
-                prod2 = y**self.chem.nu_prod
-                masked_prod2 = np.ma.array(prod2, mask = False)
-                masked_prod2[i] = True
-                derivs[i,self.chem.reversible] = derivs[i,self.chem.reversible] -self.chem.nu_prod[i]*y[i]**(self.chem.nu_prod[i]-1)*  self.kb * np.product(masked_prod2[:, self.chem.reversible], axis=0)
-        nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
-        jac = np.zeros((N,N))
-        for j in range(N):
-            jac[:,j] = np.sum(derivs[j] * nu_diff_matrix, axis=1)
-
-        return jac
-    """
-
-    def solve(self, y0, T, t1, dt, algorithm='lsoda', use_jac = False, **options):
-        '''Solve reaction rate ODEs to get concentration as a function of time. Wraps around scipy.integrate.ode
+    def solve(self, y0, T, t1, dt, algorithm='lsoda', **options):
+        '''Solve ODEs
 
         INPUTS
         ======
@@ -118,8 +85,6 @@ class ChemSolver:
             Integration step.
         algorithm: string, optional
             Integration algorithm. default value is 'lsoda'
-        use_jac: boolean, optional
-            Option to use analytic Jacobian. Default value is False, where SciPy calculates the Jacobian using finite differences
         **options:
             Options passed to scipy.integrate.ode.set_integrator (see https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html)
         '''
@@ -127,10 +92,7 @@ class ChemSolver:
         # get variables not changed in ODE
         _,self.kf, self.kb = self.chem._progress_rate_init(y0, T)
         self.nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
-        if use_jac:
-            r = ode(self.__dy_dt, self._jac).set_integrator(algorithm, **options)
-        else:
-            r = ode(self.__dy_dt).set_integrator(algorithm, **options)
+        r = ode(self.__dy_dt).set_integrator(algorithm, **options)
         r.set_initial_value(y0, 0)
         self._t = [0]
         self._y = [y0]
