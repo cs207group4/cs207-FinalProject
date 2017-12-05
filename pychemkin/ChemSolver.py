@@ -20,6 +20,8 @@ class ChemSolver:
      - get_results(return_reaction_rate=True): method to return the solution of ODEs, which includes an array of
        time points, an array of solution values (species concentrations) at each time point, and an array of
        reaction rates (optional)
+     - to_df(): returns the ODE solver output in the form of a pandas dataframe
+     - is_equilibrium(): checks whether the system has reached equilibrium
      - save_results(file_name): method to save the solution of ODEs to a csv or hdf5 file.
      - load_results(file_name): method to load the solution of ODEs from a csv or hdf5 file storing the data
      - grid_solve(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different
