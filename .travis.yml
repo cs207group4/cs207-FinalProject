@@ -20,7 +20,7 @@ script:
     #- pip uninstall --yes pychemkin
     # test package build
     - python setup.py sdist --format=tar
-    - pip install dist/pychemkin-1.1.0.tar
+    - pip install dist/pychemkin-1.1.1.tar
     - py.test    
     # DO NOT BUILD SCIPY --IT'S EVAL
     - pip install numpy pandas scipy
