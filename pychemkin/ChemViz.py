@@ -19,11 +19,12 @@ class ChemViz:
 
     INSTANCE METHODS and ATTRIBUTES
     ========
-     - plot_network(yaxis, species = None, tmin = 0, tmax = None, outputfile=None)
-     - plot_time_series()
+     - plot_network(yaxis, species = None, tmin = 0, tmax = None, outputfile=None): plots reaction diagram
+     - plot_time_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None): plots a single time series of concentration or reaction rates
+     - plot_gridtime_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None): plots a grid of time series for temperature/initial concentration combos
      - html_report(file_name)
 
-    See method doc for details
+    See model doc for additional details
 
     EXAMPLE
     =========

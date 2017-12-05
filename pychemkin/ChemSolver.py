@@ -12,7 +12,7 @@ class ChemSolver:
 
     METHODS and ATTRIBUTES
     ========
-    After initialization, user could call:
+    After initialization, the user can call:
      - solve(y0, T, t_span, t_eval=None, **options): method to solve the differential equations given an initial
        value of species concentrations:
            dy / dt = chemkin.reaction_rate(y, T)
@@ -24,7 +24,8 @@ class ChemSolver:
      - load_results(file_name): method to load the solution of ODEs from a csv or hdf5 file storing the data
      - grid_solve(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different
        combinations of starting concentrations and temperatures
-     - get_grid_solve_result(): method to return the grid search starting conditions and results
+     - get_grid_results(): method to return the grid search starting conditions and results
+     - save_grid_results(file_prefix, filetype): method to save the grid results as csv or HDF5 files
 
     EXAMPLES
     =========
