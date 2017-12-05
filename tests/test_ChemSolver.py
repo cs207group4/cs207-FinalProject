@@ -24,6 +24,7 @@ def test_grid_search():
     _y2 = ChemSolver(chem).solve(y0s[0], Ts[0], t1, dt, algorithm='lsoda').get_results()[1]
     assert str(_y1) == str(_y2)
     print(_y1)
+    gs.save_grid_results('abc')
 
 def test_ODE_not_solved():
     chem = chemkin("tests/test_xml/rxns.xml")
