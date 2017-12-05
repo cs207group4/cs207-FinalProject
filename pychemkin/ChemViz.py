@@ -265,7 +265,7 @@ class ChemViz:
         ## Concentration or reaction rate
         if type(yaxis) != str:
             raise TypeError("yaxis must be string")
-        filtered_df = dataframe
+        filtered_df = dataframe.copy()
         ## Concentration
         lowyaxis = yaxis.lower()
         if lowyaxis == "concentration":
