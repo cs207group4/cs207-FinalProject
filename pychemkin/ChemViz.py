@@ -69,7 +69,7 @@ class ChemViz:
         return df[(df['t']<=tmax) & (df['t']>=tmin)]
 
 
-    def subplot_network(self, fig, nrow, ncol, panel, timepoint):
+    def _subplot_network(self, fig, nrow, ncol, panel, timepoint):
         """
         Plots reaction diagram for a single timepoint
 
@@ -216,7 +216,7 @@ class ChemViz:
         figsize = (7,14)
         fig = plt.figure(figsize = figsize)
         for i, t in enumerate(timepoints):
-            self.subplot_network(fig, 2, 1, i+1, t)
+            self._subplot_network(fig, len(timepoints), 1, i+1, t)
         plt.tight_layout()
 
         if outputfile:
