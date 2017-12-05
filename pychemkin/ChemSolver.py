@@ -1,14 +1,14 @@
+import warnings
 import numpy as np
 import pandas as pd
-import warnings
 from scipy.integrate import ode
 from .chemkin import chemkin
 
 
 class ChemSolver:
     '''
-    The ChemSolver module wraps around SciPy's ODE solver to obtain the evolution of concentrations and reaction
-    rates over time
+    The ChemSolver module wraps around a SciPy ODE solver to obtain the evolution of concentrations and reaction
+    rates with time
 
     METHODS and ATTRIBUTES
     ========
@@ -22,9 +22,9 @@ class ChemSolver:
        reaction rates (optional)
      - save_results(file_name): method to save the solution of ODEs to a csv or hdf5 file.
      - load_results(file_name): method to load the solution of ODEs from a csv or hdf5 file storing the data
-     - grid_search(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different
+     - grid_solve(y0s, Ts, t_span, return_reaction_rate=True, **options): method to solve ODE at different
        combinations of starting concentrations and temperatures
-     - get_grid_search_result(): method to return the grid search starting conditions and results
+     - get_grid_solve_result(): method to return the grid search starting conditions and results
 
     EXAMPLES
     =========
@@ -54,6 +54,19 @@ class ChemSolver:
         self.finished = False
 
     def __dy_dt(self, t, y):
+        '''
+        INPUT
+        =====
+        t: float, required
+           Time in seconds
+        y: Array of floats, required
+           Concentration vector of length N corresponding to time t
+
+        RETURNS
+        =======
+        Length-N array of floats corresponding to reaction rates at time t
+
+        '''
         r = self.chem._progress_rate_default_T(y.reshape(-1,1),self.kf,self.kb)
         return np.sum(r * self.nu_diff_matrix, axis=1)
     """
@@ -91,7 +104,7 @@ class ChemSolver:
     """
 
     def solve(self, y0, T, t1, dt, algorithm='lsoda', use_jac = False, **options):
-        '''Solve ODEs
+        '''Solve reaction rate ODEs to get concentration as a function of time. Wraps around scipy.integrate.ode
 
         INPUTS
         ======
@@ -108,7 +121,7 @@ class ChemSolver:
         use_jac: boolean, optional
             Option to use analytic Jacobian. Default value is False, where SciPy calculates the Jacobian using finite differences
         **options:
-            Options passed to scipy.integrate.ode.set_integrator
+            Options passed to scipy.integrate.ode.set_integrator (see https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html)
         '''
         self.T = T
         # get variables not changed in ODE
@@ -167,15 +180,15 @@ class ChemSolver:
             return t, y, None
 
     def is_equilibrium(self,tol=1.):
-        '''If the reaction system has reached equilibrium
+        '''Checks whether the reaction system has reached equilibrium
 
         INPUT
         =======
-        tol: allowed error. If all derivatives less than tol, system will be considered equilibrium
+        tol: allowed error. If all derivatives less than tol, system will be considered at equilibrium
 
         RETURN
         =======
-        is_equilibrium: bool. Indicate equilibrium or not
+        is_equilibrium: bool. Indicate whether system is at equilibrium or not
         '''
 
         if self._sol is None:
@@ -183,11 +196,11 @@ class ChemSolver:
         return np.all(np.abs(self.__dy_dt(0, self._y[:,-1]))<tol)
 
     def to_df(self):
-        '''Save the solution of ODEs to a pandas dataframe
+        '''Return pandas dataframe holding ODE solutions
 
         RETURNS
         =======
-        df: pandas data frame containing the solution
+        df: pandas dataframe storing the times and corresponding concentrations and reaction rates
 
         '''
         if self._sol is None:
@@ -205,7 +218,7 @@ class ChemSolver:
         return pd.DataFrame.from_records(values, cols).transpose()
 
     def save_results(self, file_name):
-        '''Save the solution of ODEs to a csv or hdf5 file
+        '''Save the ODE solutions (for single temperature/concentration combination) to a csv or hdf5 file
 
         INPUT
         ======
@@ -247,7 +260,7 @@ class ChemSolver:
         self.nu_diff_matrix = self.chem.nu_prod-self.chem.nu_react
         return self
 
-    def grid_search(self, y0s, Ts, t1, dt, method='lsoda', return_reaction_rate=True, **options):
+    def grid_solve(self, y0s, Ts, t1, dt, algorithm='lsoda', return_reaction_rate=True, **options):
         '''Solve ODEs at user specified combinations of starting concentrations and temperatures
 
         INPUTS
@@ -257,17 +270,17 @@ class ChemSolver:
         T: array_like, shape(n_T_cond,), required
             A length-n_T_cond vector specifying n_T_cond temperatures in K
         t1: float, required
-            Integration end point. The solver starts with t=0 and integrates until it reaches t=t1.
+            Integration end point in seconds. The solver starts with t=0 and integrates until it reaches t=t1.
         dt: float, required
-            Integration step.
-        method: string, optional
+            Integration step in seconds
+        algorithm: string, optional
             Integration algorithm. default value is 'lsoda'
         return_reaction_rate: bool, optional
             If True (default), calculate reaction rates
         **options:
             Options passed to scipy.integrate.set_integrator
         '''
-        self.grid_result = {T:[self.solve(y0, T, t1, dt, method, **options).\
+        self.grid_result = {T:[self.solve(y0, T, t1, dt, algorithm, **options).\
                                get_results(return_reaction_rate) for y0 in y0s] for T in Ts}
         self.grid_condition = [Ts, y0s]
         self._sol = None
@@ -275,6 +288,52 @@ class ChemSolver:
         return self
 
     def get_grid_results(self):
-        '''Return the grid search starting conditions and results
+        '''Return the grid_solve starting conditions and results
         '''
         return self.grid_condition, self.grid_result
+
+    def _gridsol_to_df(self, T, solutiontuple):
+        '''Helper function to return pandas dataframe holding ODE solutions from individual temperature/concentration combo in grid solutions
+
+        INPUT
+        =====
+        T: temperature, K
+        solutiontuple: tuple, required
+                       (time, concentration, reaction rate) array contained in grid_solve dictionary output
+        RETURNS
+        =======
+        df: pandas dataframe storing the times and corresponding concentrations and reaction rates
+
+        '''
+        t = solutiontuple[0]
+        y = solutiontuple[1]
+        rr = solutiontuple[2]
+        cols = ['t'] + ['{}-Concentration'.format(s) for s in self.chem.species] \
+        + ['{}-Reaction_rate'.format(s) for s in self.chem.species] + ['T']
+        values = np.concatenate((t.reshape(1, len(t)), y.reshape(len(y), len(t)), \
+                                 rr.reshape(len(rr), len(t)), T * np.ones((1, (len(t))))), axis=0)
+        return pd.DataFrame.from_records(values, cols).transpose()
+
+    def save_grid_results(self, file_prefix, filetype = 'csv'):
+        '''Save the ODE solutions (for a combination of temperatures/concentrations combination) to a group of csv or hdf5 files
+
+        INPUT
+        ======
+        file_prefix: string, required
+            Filename prefix for series of csv or hdf5 files holding grid results
+        filetype: string, required
+                'csv' or 'hdf5' are the output formats supported
+        '''
+        if filetype not in ('csv', 'hdf5'):
+            raise ValueError('Only csv and hdf5 are supported.')
+
+        if self.grid_condition is None or self.grid_result is None:
+            raise ValueError('No grid solutions have been stored yet!')
+        for i, Temp in enumerate(self.grid_condition[0]):
+            for j, conc in enumerate(self.grid_condition[1]):
+                df = self._gridsol_to_df(Temp, self.grid_result[Temp][j])
+                file_string = '{}_T{}_x{}'.format(file_prefix, i, j)
+                if filetype=='csv':
+                    df.to_csv(file_string+'.csv', index=False)
+                elif filetype=='hdf5':
+                    df.to_hdf(file_string+'.h5', 'df',index=False)

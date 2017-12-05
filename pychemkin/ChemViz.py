@@ -220,22 +220,31 @@ class ChemViz:
             plt.savefig(outputfile)
         return fig
 
-    def plot_time_series(self, yaxis, species = None, tmin = 0, tmax = None, outputfile=None):
+    def _plot_df(self, dataframe, fig, nrow, ncol, panel, yaxis, T, species = None, tmin = 0, tmax = None):
         """
-        Make plot of either species concentrations or reaction rates as a function of time
+        Helper function for making a plot of either species concentrations or reaction rates as a function of time for a single simulation from ChemSolver
 
         INPUT
         ====
+        dataframe: pandas dataframe, required
+               dataframe with column information about timesteps, concentration rates, and reaction rates
+        fig: Matplotlib figure instance, required
+        nrow: Integer, required
+              Number of rows desired for network plot
+        ncol: Integer, required
+              Number of columns desired for network plot
+        panel: Integer, required
+              Panel number of subplot
         yaxis: String, required
                Parameter to be plotted ('reactionrate' or 'concentration')
+        T: float, required
+               Temperature at which system of reactions takes place
         species: List of strings, required
                Species to be plotted. Default is all species
         tmin: float, required
               First time point in plot. Default is 0s
         tmax: float, required
               Last time point in plot. Default is last time point in simulation
-        outputfile: String, optional
-             Name of png file to save to
         """
         #make default species list all species
         if species is None:
@@ -248,15 +257,15 @@ class ChemViz:
         ## Concentration or reaction rate
         if type(yaxis) != str:
             raise TypeError("yaxis must be string")
-        filtered_df = self.df
+        filtered_df = dataframe
         ## Concentration
         lowyaxis = yaxis.lower()
         if lowyaxis == "concentration":
-            concentration_cols = [col for col in self.df.columns if 'Concentration' in col] + ['t']
+            concentration_cols = [col for col in dataframe.columns if 'Concentration' in col] + ['t']
             filtered_df = filtered_df[concentration_cols]
         ## reaction rate
         elif lowyaxis == "reactionrate":
-            rxn_cols = [col for col in self.df.columns if 'Reaction_rate' in col] + ['t']
+            rxn_cols = [col for col in dataframe.columns if 'Reaction_rate' in col] + ['t']
             filtered_df = filtered_df[rxn_cols]
 
         else:
@@ -276,23 +285,78 @@ class ChemViz:
         #Specify which species
         listofsp = list(filtered_df.columns)
         filtered_df = filtered_df[listofsp]
-        #make plot
-        plt.ioff()
-        fig = plt.figure(figsize = (7,4))
+        ax = fig.add_subplot(nrow, ncol, panel)
+        title = "{} vs. time at T = {} K".format(lowyaxis, T)
 
-        title = "Plot of {} vs. time".format(lowyaxis)
-
-        plt.title(title)
+        ax.set_title(title)
 
         for i,v in enumerate(species):
 
-            plt.plot(filtered_df['t'],filtered_df[v], label = self.__make_tex_string(v), color = plt.cm.jet((i+1)/(len(species))))
+            ax.plot(filtered_df['t'],filtered_df[v], label = self.__make_tex_string(v), color = plt.cm.brg((i+1)/(len(species))))
+        if panel==nrow*ncol:
+            ax.legend(bbox_to_anchor=(1.25, 0.5))
+        ax.set_xlim(xmin = tmin, xmax = tmax)
+        ax.set_ylabel(lowyaxis)
+        ax.set_xlabel('time (seconds)')
+        return ax
 
-        plt.legend(bbox_to_anchor=(1.2, 0.5))
-        plt.xlim(xmin = tmin, xmax = tmax)
-        plt.ylabel(lowyaxis)
-        plt.xlabel('time (seconds)')
+
+
+    def plot_time_series(self, yaxis, species = None, tmin = 0, tmax = None, outputfile=None):
+        """
+        Make plot of either species concentrations or reaction rates as a function of time for a single simulation from ChemSolver
+
+        INPUT
+        ====
+        yaxis: String, required
+               Parameter to be plotted ('reactionrate' or 'concentration')
+        species: List of strings, required
+               Species to be plotted. Default is all species
+        tmin: float, required
+              First time point in plot. Default is 0s
+        tmax: float, required
+              Last time point in plot. Default is last time point in simulation
+        outputfile: String, optional
+             Name of png file to save to
+        """
+        plt.ioff()
+        fig = plt.figure(figsize = (7,4))
+
+        self._plot_df(self.df, fig, 1, 1, 1, yaxis, self.chemsol.T, species = species, tmin = tmin, tmax = tmax)
         plt.subplots_adjust(right = 0.8)
+        if outputfile:
+            plt.savefig(outputfile)
+
+        return fig
+
+    def plot_gridtime_series(self, yaxis, species = None, tmin = 0, tmax = None, outputfile=None):
+        """
+        Make plot of either species concentrations or reaction rates as a function of time for grid simulations from ChemSolver
+
+        INPUT
+        ====
+        yaxis: String, required
+               Parameter to be plotted ('reactionrate' or 'concentration')
+        species: List of strings, required
+               Species to be plotted. Default is all species
+        tmin: float, required
+              First time point in plot. Default is 0s
+        tmax: float, required
+              Last time point in plot. Default is last time point in simulation
+        outputfile: String, optional
+             Name of png file to save to
+        """
+        plt.ioff()
+        if self.chemsol.grid_condition is None or self.chemsol.grid_result is None:
+            raise ValueError('No grid solutions have been computed yet!')
+        num_temps = len(self.chemsol.grid_condition[0])
+        num_conc = len(self.chemsol.grid_condition[1])
+        fig = plt.figure(figsize = (6*num_temps,6*num_conc))
+        for i, Temp in enumerate(self.chemsol.grid_condition[0]):
+            for j, conc in enumerate(self.chemsol.grid_condition[1]):
+                df = self.chemsol._gridsol_to_df(Temp, self.chemsol.grid_result[Temp][j])
+                self._plot_df(df, fig, num_temps, num_conc, i*num_conc+j+1, yaxis, Temp, species = species, tmin = tmin, tmax = tmax)
+        plt.subplots_adjust(right = 0.75, hspace = 0.25, wspace = 0.25)
         if outputfile:
             plt.savefig(outputfile)
 
