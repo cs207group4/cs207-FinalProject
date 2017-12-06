@@ -21,7 +21,7 @@ class ChemViz:
      - plot_network(yaxis, species = None, tmin = 0, tmax = None, outputfile=None): plots reaction diagram
      - plot_time_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None): plots a single time series of concentration or reaction rates
      - plot_gridtime_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None): plots a grid of time series for temperature/initial concentration combos
-     - html_report(file_name)
+     - html_report(file_name): generate an HTML report and save it to file_name
 
     See method doc for additional details
 
