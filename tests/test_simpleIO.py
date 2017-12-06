@@ -7,7 +7,7 @@ def test_simpleIO():
     x_init = np.ones(8)
     T = 2000
     t_final = 3.e-13
-    t_step = 1.e-15
+    t_step = 1.e-16
     cs = ChemSolver(chem2).solve(x_init, T, t_final, t_step, algorithm = 'lsoda')
     r1 = cs.get_results()
 

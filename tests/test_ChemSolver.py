@@ -67,3 +67,39 @@ def test_wrong_file_name():
     except ValueError as e:
         assert type(e) == ValueError
         print(e)
+
+def test_demo():
+    x_init = np.ones(8)
+    T = 1000
+
+    # integration end time
+    t_max = 5.e-13
+
+    # step size
+    dt = 1.e-16
+
+    cs = ChemSolver(chemkin('tests/test_xml/demo.xml')).solve(x_init, T, t_max, dt)
+    assert not cs.is_equilibrium()
+    t, y, rr = cs.get_results(return_reaction_rate=False)
+    assert rr is None
+    t, y, rr = cs.get_results()
+    assert rr is not None
+    print(y)
+
+def test_reversible():
+    x_init = np.ones(8)
+    T = 1000
+
+    # integration end time
+    t_max = 5.e-13
+
+    # step size
+    dt = 1.e-16
+
+    cs = ChemSolver(chemkin('tests/test_xml/rxns_reversible.xml')).solve(x_init, T, t_max, dt)
+    assert not cs.is_equilibrium()
+    t, y, rr = cs.get_results(return_reaction_rate=False)
+    assert rr is None
+    t, y, rr = cs.get_results()
+    assert rr is not None
+    print(y)
