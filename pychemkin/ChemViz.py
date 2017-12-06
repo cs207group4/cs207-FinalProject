@@ -302,7 +302,7 @@ class ChemViz:
 
             ax.plot(filtered_df['t'],filtered_df[v], label = self.__make_tex_string(v), color = plt.cm.brg((i+1)/(len(species))))
         if panel==nrow*ncol:
-            ax.legend(bbox_to_anchor=(1.25, 0.5))
+            ax.legend(bbox_to_anchor=(1.25, 1.1))
         ax.set_xlim(xmin = tmin, xmax = tmax)
         ax.set_ylabel(lowyaxis)
         ax.set_xlabel('time (seconds)')
