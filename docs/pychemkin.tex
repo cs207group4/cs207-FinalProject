@@ -35,7 +35,7 @@
 \section{Introduction}
 
 
-{\tt pychemkin} is a Python 3 chemical kinetics library. The core functionality is to compute species' reaction rates and concentrations in a system of elementary reactions. New extended functionality now allows reaction rates and concentrations to be computed as a function of time and to be visualized, in order to facilitate understanding of the timescales upon which the system operates and the production yields of the system. 
+{\tt pychemkin} is a Python 3 chemical kinetics library. The core functionality is to compute reaction rates of all species participating in a reaction system. New extended functionality now allows reaction rates and concentrations to be computed as a function of time and to be visualized, in order to facilitate understanding of the timescales upon which the system operates, the production yields of the system, and sensitivity to initial conditions. 
 
 \subsection{Key chemical concepts and terminology}
 
@@ -108,9 +108,9 @@ These are known as the \textbf{NASA polynomials}. For each specie, there are two
 
 \subsection{Features}
 \subsubsection{Basic}
-The package can solve for the reaction rates of a system of elementary reactions. The number of reactions and species is arbitrary. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array. \texttt{pychemkin} stores the NASA polynomials for computing thermodynamic quantities (taken from \url{http://burcat.technion.ac.il/dir/}) in an sqlite database and retrieves values for species requested by the user. 
+The package can solve for the reaction rates of a system of elementary reactions (both reversible and irreversible). The number of reactions and species is arbitrary. For each system of reactions, the user supplies the species participating in the reactions, the chemical equations, the stoichiometric coefficients for the reactants and products, and the rate coefficient parameters (e.g., $E$ and $A$ for Arrhenius rates). For a given system, the user can then specify a temperature and a vector of species concentrations in order to return the reaction rates in the form of a NumPy array. \texttt{pychemkin} stores the NASA polynomials for computing thermodynamic quantities (taken from \url{http://burcat.technion.ac.il/dir/}) in an sqlite database and retrieves values for species requested by the user. 
 \subsubsection{Advanced}
-The updated version of \texttt{pychemkin} can now compute the time-evolution of reaction rates and concentration rates and visualize the results. See Section 4 for more details. 
+The updated version of \texttt{pychemkin} can now compute and save the time-evolution of reaction rates and concentration and then visualize the results. See Section 4 for more details. 
 
 
 
@@ -118,12 +118,14 @@ The updated version of \texttt{pychemkin} can now compute the time-evolution of 
 
 \subsection{Where to find and download the code}
 \subsubsection{Using pip}
-\texttt{pychemkin} v. 1.1.0 is hosted on PyPi at \url{https://pypi.python.org/pypi/pychemkin}. To download and install the package, simply type 
+The most recent stable release of \texttt{pychemkin} is hosted on PyPi at \url{https://pypi.python.org/pypi/pychemkin}. To download and install the package, simply type 
 \texttt{pip install pychemkin} into your terminal.
 \subsubsection{Installing from source and contributing to the source code}
 While \texttt{pip} is the preferred method of installation, you may prefer to obtain the most up-to-date version from GitHub, especially if you are interested in developing the code further. The most up-to-date version is hosted at \url{https://github.com/cs207group4/cs207-FinalProject}. If you have a GitHub account, you can simply open your terminal and type {\tt git clone git@github.com:cs207group4/cs207-FinalProject.git}. Otherwise, you can download the package by clicking on the green button in the upper right corner of the page that says "Clone or download," then click "Download ZIP" to download the entire repository as a ZIP file. Once you download the contents of the repository from GitHub, enter the directory and type {\tt python setup.py install}.
 
 In order to run the test suite, you need to have \href{https://docs.pytest.org/en/latest/}{pytest} v. 3.00+ and \href{https://pypi.python.org/pypi/pytest-cov}{pytest-cov} v. 2.5+ installed. When you're in the top level of the package directory, type {\tt pytest} into the terminal. The results of the test code will be printed out to the terminal.
+
+To contribute to the code, simply fork our repository and place a pull request when you're ready. 
  \newline
 
 \subsection{Third-party dependencies}
@@ -230,7 +232,7 @@ array([  6.55925729e+06,   2.69357993e+05,   1.00000000e+03])
 \subsection{Computing the time evolution of reaction rates and species concentrations}
 The reaction rate function outputs the right-hand side of the equation
 \begin{equation}
-\frac{dx_i}{dt} = f(x\_i, t)
+\frac{dx_i}{dt} = f(x_i, t)
 \end{equation}
 
 You can solve for $x_i(t)$ with the following function calls, for which we use the file from test\_xml/rxns\_reversible.xml for illustrative purposes. 
@@ -259,7 +261,7 @@ The user also has the option of viewing and manipulating the data in the form of
 
 If the calculations are lengthy, we recommend saving them in either csv or HDF5 format with the following commands:\\
 \texttt{df.save\_results(`simulationdata.csv')} or \texttt{df.save\_results(`simulationdata.h5')}. 
-\\
+
 To quickly explore parameter space with different temperatures and starting concentration values, the user can do the following: 
 
 \begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
@@ -276,14 +278,14 @@ To get the parameters explored for the grid and a dictionary of the grid ouput, 
 \texttt{initial\_conditions, results = cs.get\_grid\_result()}
 The results can be saved to csv or hdf5 with the following command: 
 \begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
->>> cs.save_grid_results(`gridoutput', filetype = 'csv')
+>>> cs.save_grid_results(`gridoutput', filetype = `csv')
 
 \end{lstlisting}
 
 For the example given above, this will result in six csv files being saved, with `gridoutput\_T0\_x0.csv' corresponding to the results for $T = 500$ and an initial concentration vector of [1,1,1,1,1,1,1,1], `gridoutput\_T1\_x1.csv' corresponding to $T = 1000$ and an initial concentration vector of [1,1,1,1,0,0,0,0], etc. 
 
 \subsection{Visualizing the time evolution of the reaction system}
-The evolution of concentration and reaction rates with time as computed by the ChemSolver module can be plotted with the ChemViz module. Going back to the first example given for the solver, we can use the following commands to plot the concentration rates of H, OH, O$_2$, and H$_2$O: from 0 to 4.5$\times10^{13}$ s. (By default, all species and the entire simulation timerange are plotted). The output image is shown in Figure 1. 
+The evolution of concentration and reaction rates with time as computed by the \texttt{ChemSolver} module can be plotted with the \texttt{ChemViz} module. Going back to the first example given for the solver, we can use the following commands to plot the concentration rates of H, OH, O$_2$, and H$_2$O from 0 to 4.5$\times10^{13}$ s. (By default, all species and the entire simulation timerange are plotted). The output image is shown in Figure 1. 
 
 \begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
 >>> import numpy as np
@@ -325,7 +327,7 @@ As a complementary approach for visualizing how a reaction system evolves, the s
 
 \end{lstlisting}
 
-The output is shown in Figure 3
+The output is shown in Figure 3. Each specie is plotted with a bubble, the size of which depends linearly on its concentration. Red bubbles indicate that the species concentration is decreasing at that time and teal bubbles indicate that the concentration is increasing. Two species are connected by a blue line if they react with one another (including reverse reactions). If the specie reacts with itself, a loop is drawn. The width of the connecting line varies logarithmically with the reaction rate coefficients ($k_f$ for the forward reactions and $k_b$ for the backward reactions). If two reactants are associated with multiple reaction coefficients (due to formation of different products), the width of the connecting line is based on the largest coefficient, and the line is shaded darker to indicate the existence of multiple pathways involving the same reactants. 
 
 \begin{figure}[h!]
   \caption{Example output for species network at three different timepoints}
@@ -333,12 +335,10 @@ The output is shown in Figure 3
   \includegraphics[width=0.6\textwidth]{../examples/modeldocfig3.png}
 \end{figure}
 
-Each specie is plotted with a bubble, the size of which depends linearly with its concentration. Red bubbles indicate that the species concentration is decreasing at that time and teal bubbles indicate that the concentration is increasing. Two species are connected by a blue line if they react with one another (including reverse reactions). If the specie reacts with itself, a loop is drawn. The width of the connecting line varies logarithmically with the reaction rate coefficients ($k_f$ for the forward reactions and $k_b$ for the backward reactions). If two reactants are associated with multiple reaction coefficients (due to formation of different products), the width of the connecting line is based on the largest coefficient, and the line is shaded darker to indicate the existence of multiple pathways involving the same reactants. 
-
 The chemical equations, reaction rate coefficients, time series plots, and network plots can be combined in a summary HTML report with the following command:\\
 \texttt{cv.html\_report(file\_name)}. For the HTML report that would be generated with the reaction system demonstrated in this section, see `examples/modeldocexample.html.'
 
-Time series of combinations of initial concentrations and temperatures can be plotted easily as well via the combination of ChemSolver and ChemVis:
+Time series of combinations of initial concentrations and temperatures can be plotted easily as well via the combination of \texttt{ChemSolver} and \texttt{ChemViz}:
 
 \begin{lstlisting}[language = Python, basicstyle = \ttfamily,columns = fullflexible, showstringspaces = False]
 >>> T = [1000,1500] #temperature in K
@@ -379,27 +379,27 @@ Users can save and load pychemkin objects by using the \texttt{simpleIO} module.
 
 \section{Implementation details of new code feature}
 \subsection{Motivation}
-Understanding how reaction systems evolve with time (i.e. the study of chemical kinetics) is important for employing chemical processes for human benefit. For example, we need to know whether the timescales over which the processes act are suitable for the desired application, we need to estimate production yields in order to determine whether a process is sufficient and to identify any problematic byproducts, and we need to be able to explore how the behavior of the system depends on initial conditions in order to identify the optimal starting conditions. Our package specifically addresses the issue of calculating and visualizing how reaction rates and species concentrations change over time. Visualization of these quantities is an essential tool for understanding the behavior of the system, since it 1) serves as a quick way to diagnose whether the inputs and calculations appear to be correct and 2) presents information in an easily digestible form and makes it easier to identify trends or relationships between different variables. 
+Understanding how reaction systems evolve with time (i.e. the study of chemical kinetics) is important for employing chemical processes for human benefit. For example, we need to know whether the timescales over which the processes act are suitable for the desired application, we need to estimate production yields in order to determine whether a process is efficient enough in producing species of interest and minimizing unwanted byproducts, and we need to be able to explore how the behavior of the system depends on initial conditions in order to identify the optimal starting conditions. Our package specifically addresses the issue of calculating and visualizing how reaction rates and species concentrations change over time. Visualization of these quantities is an essential tool for understanding the behavior of the system, since it 1) serves as a quick way to diagnose whether the inputs and calculations appear to be correct and 2) presents information in an easily digestible form and makes it easier to identify trends or relationships between different variables. 
 \subsection{New modules}
 The extension of pychemkin involved the creation of three new classes: \texttt{ChemSolver}, \texttt{ChemViz}, and \texttt{simpleIO}. The design and implementation of each new class is described below. 
 \subsubsection{ChemSolver}
-The \texttt{ChemSolver} module solves reaction rate equations (a first-order ordinary differential equation (ODE) system) to obtain species reaction rates and concentrations as a function of time. The module wrap arounds \texttt{SciPy}'s ODE library, which is a well-tested and widely used Python implementation of popular ODE solving algorithms. ChemSolver is initialized with a chemkin object. 
+The \texttt{ChemSolver} module solves reaction rate equations (a first-order ordinary differential equation (ODE) system) to obtain species reaction rates and concentrations as a function of time. The module wrap arounds \texttt{SciPy}'s ODE library, which is a well-tested and widely used Python implementation of popular ODE solving algorithms. \texttt{ChemSolver} is initialized with a \texttt{chemkin} object. 
 
 The user-facing methods are as follows: 
 \begin{itemize}
-\item \texttt{solve(self, y0, T, t1, dt, algorithm=`lsoda', **options)}: This method wraps around \texttt{scipy.integrate.ode} to solve for reaction rates and species concentrations as a function of time. $y0$ is the initial concentration, $T$ is the temperature, $t1$ is the endpoint for the integration, $dt$ is the interval for which solutions should be returned, `algorithm' is the choice of SciPy algorithm for solving the ODE system, and the optional parameters are the options listed in the documentation for \href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html}\texttt{scipy.integrate.ode}. The five integrator options available through SciPy are \texttt{lsoda}, \texttt{vode}, \texttt{zvode}, \texttt{dop853}, and \texttt{dopri5}. Because reaction rate equation systems are often \href{https://www.mathworks.com/help/matlab/math/solve-stiff-odes.html}{stiff}, meaning that algorithms have to take very small timesteps to achieve numerical stability. For this reason, we recommend the usage of either \texttt{lsoda} or \texttt{vode} with `method = ``bdf"' (backwards differentiation formula), which are specifically designed for stiff systems. By default, we use \texttt{lsoda}, which can automatically transition between stiff and non-stiff methods, which allows for more efficient calculations in cases where the system is not stiff. Note that $dt$ corresponds to the interval for which the solutions are returned to the user, NOT to the internal timestep that the integrator takes. This timestep is chosen automatically through SciPy, but if the integrator appears to be terminating prematurely or the solver appears to be unstable, the internal timesteps can be adjusted using the optional parameters \texttt{nsteps} (number of internal steps taken per integration interval), and \texttt{min\_step} and \texttt{max\_step} for the smallest and largest possible step sizes taken by the integrator. 
-\item \texttt{get\_results(return\_reaction\_rate=True)}, \texttt{to\_df()}, \texttt{save\_results(file\_name)}, and \texttt{load\_results(file\_name)} are the various methods to save and retrieve the results, depending on the user's needs. \texttt{get\_results} simply returns a tuple of (time, concentrations, reaction rates) if the user plans to manipulate these variables further in the program. \texttt{to\_df} creates a pandas dataframe for the output data, for ease of viewing and to take advantage of convenient indexing and slicing. The user has the option of saving the output data in the form of a table of the concentration and reaction rates at every time step with \texttt{save\_results}. The two output formats are csv and HDF5. The csv format is convenient because it can easily be processed by many external programs, and the user can simply open up the file to retrieve values as necessary. The HDF5 format is convenient for large files, if the user has a large number of species or timesteps. \texttt{load\_results} will load the output csv or HDF5 file back into memory, to make it convenient for the user to manipulate that data in other forms (e.g., in the forms returned by \texttt{to\_df} and \texttt{get\_results}. 
+\item \texttt{solve(self, y0, T, t1, dt, algorithm=`lsoda', **options)}: This method wraps around \texttt{scipy.integrate.ode} to solve for reaction rates and species concentrations as a function of time. $y0$ is the initial concentration, $T$ is the temperature, $t1$ is the endpoint for the integration, $dt$ is the interval for which solutions should be returned, `algorithm' is the choice of SciPy algorithm for solving the ODE system, and the optional parameters are the options listed in the documentation for \href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html}{\texttt{scipy.integrate.ode}}. The five integrator options available through SciPy are \texttt{lsoda}, \texttt{vode}, \texttt{zvode}, \texttt{dop853}, and \texttt{dopri5}. Reaction rate equation systems are often \href{https://www.mathworks.com/help/matlab/math/solve-stiff-odes.html}{stiff}, meaning that algorithms have to take very small timesteps to achieve numerical stability. For this reason, we recommend the usage of either \texttt{lsoda} or \texttt{vode} with `method = ``bdf"' (backwards differentiation formula), which are specifically designed for stiff systems. By default, we use \texttt{lsoda}, which can automatically transition between stiff and non-stiff methods, which allows for more efficient calculations in cases where the system is not stiff. Note that $dt$ corresponds to the interval for which the solutions are returned to the user, NOT to the internal timestep that the integrator takes. This timestep is chosen automatically through SciPy, but if the integrator appears to be terminating prematurely or the solver appears to be unstable, the internal timesteps can be adjusted using the optional parameters \texttt{nsteps} (number of internal steps taken per integration interval), and \texttt{min\_step} and \texttt{max\_step} for the smallest and largest possible step sizes taken by the integrator. 
+\item \texttt{get\_results(return\_reaction\_rate=True)}, \texttt{to\_df()}, \texttt{save\_results(file\_name)}, and \texttt{load\_results(file\_name)} are the various methods to save and retrieve the results, depending on the user's needs. \texttt{get\_results} simply returns a tuple of (time, concentrations, reaction rates) if the user plans to manipulate these variables further in the program. \texttt{to\_df} creates a pandas dataframe for the output data, for ease of viewing and to take advantage of convenient indexing and slicing. The user has the option of saving the output data in the form of a table of the concentration and reaction rates at every time step with \texttt{save\_results}. The two output formats are csv and HDF5. The csv format is convenient because it can easily be processed by many external programs, and the user can simply open up the file to retrieve values as necessary. The HDF5 format is convenient for large files, if the user has a large number of species or timesteps. \texttt{load\_results} will load the output csv or HDF5 file back into memory, to make it convenient for the user to manipulate that data in other forms (e.g., in the forms returned by \texttt{to\_df} and \texttt{get\_results}). 
 \item \texttt{is\_equilibrium(tol = 1.)} is a function that assesses whether a chemical kinetics simulation has reached steady-state by checking whether the reaction rates are sufficiently close to zero (given a tolerance level by the user). As a complementary check, the user may also wish to examine plots of concentration vs. time to see whether the curves level off (see next section). 
 \item \texttt{grid\_solve(y0s, Ts, t1, dt, algorithm=`lsoda', return\_reaction\_rate=True, **options)} is a function intended to solve for the concentrations and reaction rates of a given system for different combinations of system temperature and initial concentrations. The inputs are similar to \texttt{solve}, except $Ts$ is now a vector of temperature values and $y0s$ is a two-dimensional array for which each row represents a different initial concentration vector. The user may be interested in this option if they wish to systematically explore parameter space by examining how varying initial concentrations or temperatures affect the time evolution of a system. 
 \item \texttt{get\_grid\_result()} and \texttt{save\_grid\_results(file\_prefix, filetype = `csv')} are functions to retrieve and store the calculations from \texttt{grid\_solve}. \texttt{get\_grid\_result} returns a tuple of the starting conditions and a dictionary of the derived concentrations and reaction rates, while \texttt{save\_grid\_results} will save the results of the simulations to csv or HDF5 files (one for each unique combination of temperature and initial concentration, each of which has a filename starting with the same `file\_prefix'. 
 \end{itemize}
 
 \subsubsection{ChemViz}
-The \texttt{ChemViz} module is a companion to the \texttt{ChemSolver} module, plotting the solutions found for the system of reaction rate ODEs. This module is built on top of Matplotlib. A ChemViz object is initialized with a ChemSolver object. 
+The \texttt{ChemViz} module is a companion to the \texttt{ChemSolver} module, plotting the solutions found for the system of reaction rate ODEs. This module is built on top of Python's Matplotlib library. A \texttt{ChemViz} object is initialized with a \texttt{ChemSolver} object. 
 
 The user-facing methods are as follows: 
 \begin{itemize}
-\item \texttt{plot\_time\_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None)} allows for concentration or reaction rates to be plotted as a function of time after ChemSolver solves for the time evolution for user's chosen reaction system. By default, all species are plotted over the entire time range for which calculations have been performed. However, since the user may only be interested in a subset of species or part of the time range, the user is allowed to enter a list of species to be plotted via the `species' keyword and the time limits for the plot via `tmin' and `tmax.' The resulting image can be saved as a png file by setting the `outputfile' keyword. 
+\item \texttt{plot\_time\_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None)} allows for concentration or reaction rates to be plotted as a function of time after \texttt{ChemSolver} solves for the time evolution of the user's chosen reaction system. By default, all species are plotted over the entire time range for which calculations have been performed. However, since the user may only be interested in a subset of species or part of the time range, the user is allowed to enter a list of species to be plotted via the `species' keyword and the time limits for the plot via `tmin' and `tmax.' The resulting image can be saved as a png file by setting the `outputfile' keyword. 
 \item \texttt{plot\_gridtime\_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None)} is similar to the previous function, except it plots a grid of time series for temperature/initial concentration combos as calculated by \texttt{ChemSolver.grid\_solve}
 \item \texttt{plot\_network(yaxis, species = None, tmin = 0, tmax = None, outputfile=None)} presents a complementary way of visually summarizing the evolution of the reaction system. Whereas the time series plots are focused on the individual species, this function plots a diagram of the species in relation to one another. It is intended to help the user quickly identify the major species in the system, assess how favorable certain reactions are, and visualize how species are consumed. For example, the time series plot may show that H is decreasing rapidly with time, but it does not identify why H is decreasing with time. The diagram provides that complementary information by showing which species H reacts with, and which pairs of reactants have more favorable reaction rate coefficients. 
 \item \texttt{html\_report(file\_name)} generates an HTML file containing a summary of the chemical equations, the reaction rate coefficients, the initial and end concentrations, and time series and network plots. The html template is based on GitHub's \href{https://github.com/pages-themes/cayman}{cayman} theme.
