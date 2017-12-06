@@ -18,7 +18,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='pychemkin',
 
-    version='1.1.5',
+    version='1.1.8',
 
     description='Chemical Kinetics Library',
     long_description=long_description,
