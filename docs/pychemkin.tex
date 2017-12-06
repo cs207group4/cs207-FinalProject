@@ -132,10 +132,12 @@ To contribute to the code, simply fork our repository and place a pull request w
 
 This package has dependencies that usually come standard with the Anaconda distribution, but will otherwise automatically be installed for you if you use pip, along with their individual dependencies (e.g., pandas requires PyTables to process HDF5 output). Other than the packages lised above for running the test-suite, the explicitly required packages outside the Python Standard Library are as follows: 
 \begin{itemize}
-\item \href{http://www.numpy.org/}{NumPy} v. 1.13+
+\item \href{http://www.numpy.org/}{NumPy} v. 1.13.3+
 \item \href{https://www.scipy.org/}{SciPy} v. 1.0.0+
 \item \href{https://pandas.pydata.org/} {Matplotlib} v. 2.0.2+
-\item \href{https://matplotlib.org/api/pyplot_api.html} {pandas} v. 0.21.0 +
+\item \href{https://matplotlib.org/api/pyplot_api.html} {pandas} v. 0.20.3 +
+\item
+\href{http://www.pytables.org} {tables} v. 3.4.2 +
 \end{itemize}
 
 \section{Basic Usage and Examples}
@@ -302,7 +304,7 @@ The evolution of concentration and reaction rates with time as computed by the \
 \begin{figure}[h!]
   \caption{Example output for concentration as a function of time for user-selected species from a given simulation.}
   \centering
-  \includegraphics[width=0.6\textwidth]{../examples/modeldocfig1.png}
+  \includegraphics[width=0.6\textwidth]{modeldocfig1.png}
 \end{figure}
 
 Similarly, the reaction rates can be plotted with the command \\
@@ -318,7 +320,7 @@ The output is shown in Figure 2.
 \begin{figure}[h!]
   \caption{Example output for reaction rates as a function of time for user-selected species from a given simulation.}
   \centering
-  \includegraphics[width=0.6\textwidth]{../examples/modeldocfig2.png}
+  \includegraphics[width=0.6\textwidth]{modeldocfig2.png}
 \end{figure}
 
 As a complementary approach for visualizing how a reaction system evolves, the species network can be diagrammed with 
@@ -332,7 +334,7 @@ The output is shown in Figure 3. Each specie is plotted with a bubble, the size 
 \begin{figure}[h!]
   \caption{Example output for species network at three different timepoints}
   \centering
-  \includegraphics[width=0.6\textwidth]{../examples/modeldocfig3.png}
+  \includegraphics[width=0.6\textwidth]{modeldocfig3.png}
 \end{figure}
 
 The chemical equations, reaction rate coefficients, time series plots, and network plots can be combined in a summary HTML report with the following command:\\
@@ -358,7 +360,7 @@ The example output is shown in Figure 4, demonstrating how highly sensitive spec
 \begin{figure}[h!]
   \caption{Example output of plot\_gridtime\_series}
   \centering
-  \includegraphics[width=0.8\textwidth]{../examples/modeldocfig4.png}
+  \includegraphics[width=0.8\textwidth]{modeldocfig4.png}
 \end{figure} 
 
 \subsection{Simple IO}
