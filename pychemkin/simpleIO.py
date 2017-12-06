@@ -11,6 +11,12 @@ class simpleIO:
     After specifying file_name (including path), user could call:
      - to_pickle(obj): method to save a python object to python-specific pickle format
      - read_pickle(): method to load a python object from a pickle file
+     
+    EXAMPLES
+    =========
+    >>> simpleIO('array.pkl').to_pickle([1,2,3,4,5])
+    >>> simpleIO('array.pkl').read_pickle()
+    [1, 2, 3, 4, 5]
     '''
     def __init__(self, file_name):
         '''
