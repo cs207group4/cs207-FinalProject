@@ -248,8 +248,8 @@ class ChemSolver:
         self.grid_result = {T:[self.solve(y0, T, t1, dt, algorithm, **options).\
                                get_results(return_reaction_rate) for y0 in y0s] for T in Ts}
         self.grid_condition = [Ts, y0s]
-        self._sol = None
-        self.reaction_rate = None
+        #self._sol = None
+        #self.reaction_rate = None
         return self
 
     def get_grid_results(self):
