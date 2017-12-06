@@ -10,14 +10,14 @@ script:
     - mv setup.py setup.py.backup
     - ls   
     # test install from pip
-    - pip install pychemkin
-    - ls
-    - py.test
+    #- pip install pychemkin
+    #- ls
+    #- py.test
     #recover
     - mv pychemkin_backup pychemkin
     - mv setup.py.backup setup.py
     - ls
-    - pip uninstall --yes pychemkin
+    #- pip uninstall --yes pychemkin
     # test package build
     - python setup.py sdist --format=tar
     - pip install dist/pychemkin-1.1.1.tar
