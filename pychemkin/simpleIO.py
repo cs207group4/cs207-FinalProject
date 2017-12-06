@@ -14,7 +14,7 @@ class simpleIO:
      
     EXAMPLES
     =========
-    >>> simpleIO('array.pkl').to_pickle([1,2,3,4,5])
+    >>> _ = simpleIO('array.pkl').to_pickle([1,2,3,4,5])
     >>> simpleIO('array.pkl').read_pickle()
     [1, 2, 3, 4, 5]
     '''
