@@ -23,7 +23,7 @@ class ChemViz:
      - plot_gridtime_series(yaxis, species = None, tmin = 0, tmax = None, outputfile=None): plots a grid of time series for temperature/initial concentration combos
      - html_report(file_name)
 
-    See model doc for additional details
+    See method doc for additional details
 
     EXAMPLE
     =========
