@@ -7,7 +7,6 @@ import pandas as pd
 import matplotlib as mpl
 from matplotlib.patches import Circle
 from matplotlib.collections import PatchCollection
-mpl.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from .chemkin import chemkin

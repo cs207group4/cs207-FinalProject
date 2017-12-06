@@ -4,6 +4,10 @@ python:
     - "3.5"
     - "3.6"
 before_install:
+    # Must add a display for visualization to work
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+    - sleep 3
     - pip install pytest pytest-cov coveralls
 script:
     - mv pychemkin pychemkin_backup
