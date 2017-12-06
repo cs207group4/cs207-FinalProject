@@ -37,6 +37,22 @@ def test_missingspecies():
         assert type(e) == AttributeError
         print(e)
 
+def test_missing_equation():
+    """test that input parser correctly identifies that species array is missing"""
+    try:
+        input_ = InputParser('tests/test_xml/rxns_missing_attribute.xml')
+    except AttributeError as e:
+        assert type(e) == AttributeError
+        print(e)
+
+def test_bad_coeff():
+    """test that input parser correctly identifies that species array is missing"""
+    try:
+        input_ = InputParser('tests/test_xml/rxns_bad_coeff.xml')
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+
 def test_missingcoeffdata():
     """test that input parser correctly identifies that coefficient data is missing"""
     try:

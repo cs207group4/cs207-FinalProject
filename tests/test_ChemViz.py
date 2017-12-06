@@ -21,6 +21,12 @@ def test_plot_gs():
     gs = ChemSolver(chem).grid_solve(y0s, Ts, t1, dt, algorithm='lsoda')
     ChemViz(gs).plot_gridtime_series('reactionrate')
     ChemViz(gs).plot_gridtime_series('concentration')
+    try:
+        ChemViz(gs).plot_gridtime_series('reactionrate',tmin=-1)
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+
 
 def test_reversible_report():
     x_init = np.ones(8)
@@ -32,7 +38,13 @@ def test_reversible_report():
     # step size
     dt = 1.e-16
 
-    cs = ChemSolver(chemkin('tests/test_xml/rxns_reversible.xml')).solve(x_init, T, t_max, dt)
+    cs = ChemSolver(chemkin('tests/test_xml/rxns_reversible.xml'))
+    try:
+        ChemViz(cs).html_report('report2.html')
+    except ValueError as e:
+        assert type(e) == ValueError
+        print(e)
+    cs.solve(x_init, T, t_max, dt)
     ChemViz(cs).html_report('report2.html')
     assert os.path.isfile('report2.html')
 
